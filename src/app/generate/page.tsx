@@ -116,7 +116,7 @@ export default function Home() {
           {
             content: message,
             role: 'user',
-          },r
+          },
         ],
       },
     })
