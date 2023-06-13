@@ -1,13 +1,16 @@
-import { NavBar } from "@/components/NavBar";
-import { Button } from "@/components/ui/button";
-import { ArrowRight } from "lucide-react";
-import Link from "next/link";
+import { NavBar } from '@/components/NavBar'
+import { Button } from '@/components/ui/button'
+import { ArrowRight } from 'lucide-react'
+import Link from 'next/link'
 
 export default function Home() {
   return (
     <main className="flex min-h-screen flex-col">
-      {/* Blob */}
-      <div className="absolute top-0 -translate-y-1/2 container w-full aspect-square bg-blue-950 rounded-full right-0 left-0 blur-3xl opacity-10 scale-125 pointer-events-none" />
+      {/* Blob container */}
+      <div className="fixed top-0 -translate-y-1/2 container w-full right-0 left-0 overflow-visible pointer-events-none">
+        {/* Blob */}
+        <div className="w-full aspect-square bg-blue-950 rounded-full blur-3xl opacity-10 scale-125" />
+      </div>
 
       {/* NavBar */}
       <NavBar />
@@ -36,5 +39,5 @@ export default function Home() {
         </div>
       </div>
     </main>
-  );
+  )
 }

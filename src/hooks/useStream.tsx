@@ -1,10 +1,7 @@
+import { useToast } from '@/components/ui/use-toast'
 import { useState } from 'react'
 
 export const useStream = () => {
-  // const [chatroomIdsResponse, setChatroomIdsResponse] = useState<{
-  //   [key: string]: { responseString: string; messageIsStreaming: boolean };
-  // }>({});
-
   const [streamResponse, setStreamResponse] = useState<{
     responseString: string
     messageIsStreaming: boolean
@@ -12,6 +9,7 @@ export const useStream = () => {
     responseString: '',
     messageIsStreaming: false,
   })
+  const { toast } = useToast()
 
   const send = async ({ url, body }: { url: string; body?: object }) => {
     setStreamResponse({ responseString: '', messageIsStreaming: false })
@@ -27,18 +25,22 @@ export const useStream = () => {
     if (!response.ok) {
       const errorMessage = await response.text()
 
-      throw new Error(
-        errorMessage ||
-          'Domained is not able to answer currently. Please try again later.'
-      )
+      toast({
+        title: 'Error',
+        description: errorMessage,
+      })
+      return
     }
 
     const data = response.body
 
     if (!data) {
-      throw new Error(
-        'Domained is not able to answer currently. Please try again later.'
-      )
+      toast({
+        title: 'Error',
+        description:
+          'Domained is not able to answer currently. Please try again later.',
+      })
+      return
     }
 
     setStreamResponse({ responseString: '', messageIsStreaming: true })

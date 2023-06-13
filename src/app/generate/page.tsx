@@ -2,14 +2,16 @@
 
 import { NavBar } from '@/components/NavBar'
 import { TimeAgo } from '@/components/TimeAgo'
+import { CopyButton } from '@/components/ui/CopyButton'
 import { SimpleTooltip } from '@/components/ui/SimpleTooltip'
 import { Button } from '@/components/ui/button'
 import { ScrollArea } from '@/components/ui/scroll-area'
 import { Spinner } from '@/components/ui/spinner'
+import { useToast } from '@/components/ui/use-toast'
 import { useStream } from '@/hooks/useStream'
 import { dateToString } from '@/lib/timeAgo'
 import { cn } from '@/lib/utils'
-import { Copy, Send, Wand2, X } from 'lucide-react'
+import { Check, List, Send, Wand2, X } from 'lucide-react'
 import { useEffect, useState } from 'react'
 
 const domainsStatic: {
@@ -66,7 +68,10 @@ export default function Home() {
     (a, b) => a.createdAt.getTime() - b.createdAt.getTime()
   )
 
+  const [onlyShowAvailable, setOnlyShowAvailable] = useState(false)
+
   const { send: sendStream, streamResponse } = useStream()
+  const { toast } = useToast()
 
   const send = async (message: string) => {
     sendStream({
@@ -173,19 +178,37 @@ export default function Home() {
   }, [domains])
 
   return (
-    <main className="flex min-h-screen flex-col gap-6 relative overflow-hidden">
+    <main className="flex min-h-screen flex-col gap-6 relative">
       <NavBar />
 
-      {/* Blob */}
-      <div className="absolute top-0 -translate-y-1/2 container w-full aspect-square bg-blue-950 rounded-full right-0 left-0 blur-3xl opacity-10 scale-125 pointer-events-none" />
+      {/* Blob container */}
+      <div className="fixed top-0 -translate-y-1/2 container w-full right-0 left-0 overflow-visible pointer-events-none">
+        {/* Blob */}
+        <div className="w-full aspect-square bg-blue-950 rounded-full blur-3xl opacity-10 scale-125" />
+      </div>
 
-      <div className="flex flex-col md:mt-4 lg:mt-8 xl:mt-20 max-w-2xl mx-auto w-full gap-2">
+      <div className="flex flex-col md:mt-4 lg:mt-8 xl:mt-20 max-w-2xl mx-auto w-full gap-2 px-4">
         <div
           className={cn(
-            'invisible flex justify-end',
+            'invisible flex justify-end gap-2',
             toRender.length > 0 && 'visible'
           )}
         >
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={() => {
+              setOnlyShowAvailable((prev) => !prev)
+            }}
+          >
+            {onlyShowAvailable ? (
+              <List size={16} className="mr-1" />
+            ) : (
+              <Check size={16} className="mr-1" />
+            )}
+            {onlyShowAvailable ? 'Show All' : 'Only show available'}
+          </Button>
+
           <Button
             variant="outline"
             size="sm"
@@ -205,6 +228,10 @@ export default function Home() {
             if (item.domain) {
               // @ts-expect-error Der is dumm
               const domain: (typeof domains)[number] = item
+
+              if (onlyShowAvailable && !domain.available) {
+                return null
+              }
               return (
                 <div
                   key={domain.name + i} // FIXME: Use a better key
@@ -216,18 +243,21 @@ export default function Home() {
                   <div>
                     <div className="flex items-center">
                       {domain.name}
-                      <Copy
-                        size={12}
+                      <CopyButton
                         className="ml-2 group-hover/item:block hidden"
-                        onClick={() => {
-                          navigator.clipboard.writeText(domain.domain)
-                        }}
+                        text={domain.name}
                       />
                     </div>
 
-                    <div className="font-light text-sm">
-                      <span className="opacity-60">https://</span>
-                      {domain.domain}
+                    <div className="flex items-center">
+                      <div className="font-light text-sm">
+                        <span className="opacity-60">https://</span>
+                        {domain.domain}
+                      </div>
+                      <CopyButton
+                        className="ml-2 group-hover/item:block hidden"
+                        text={domain.domain}
+                      />
                     </div>
                   </div>
 
@@ -306,44 +336,46 @@ export default function Home() {
       </div>
 
       {/* Input */}
-      <form
-        className="max-w-2xl mx-auto w-full border border-input rounded-lg flex items-center px-4"
-        onSubmit={(e) => {
-          e.preventDefault()
-          send(myMessage)
-          setMessages((prev) => [
-            ...prev,
-            {
-              content: myMessage,
-              role: 'user',
-              createdAt: new Date(),
-            },
-          ])
-          setMyMessage('')
-        }}
-      >
-        <input
-          type="text"
-          className="w-full h-12 text-base font-light placeholder-gray-400 bg-transparent active:ring-0 focus:ring-0 focus:outline-none"
-          value={myMessage}
-          onChange={(e) => setMyMessage(e.target.value)}
-          placeholder="Chat to generate new domains..."
-        />
-        <SimpleTooltip title="Send">
-          <Button
-            variant="ghost"
-            size="sm"
-            className="whitespace-nowrap text-gray-300"
-            type="submit"
-          >
-            {streamResponse.messageIsStreaming ? (
-              <Spinner />
-            ) : (
-              <Send className="w-5" />
-            )}
-          </Button>
-        </SimpleTooltip>
-      </form>
+      <div className="max-w-2xl mx-auto w-full px-4">
+        <form
+          className="border border-input rounded-lg flex items-center w-full px-4"
+          onSubmit={(e) => {
+            e.preventDefault()
+            send(`${myMessage} give me 5 brandname suggestions`)
+            setMessages((prev) => [
+              ...prev,
+              {
+                content: myMessage,
+                role: 'user',
+                createdAt: new Date(),
+              },
+            ])
+            setMyMessage('')
+          }}
+        >
+          <input
+            type="text"
+            className="w-full h-12 text-base font-light placeholder-gray-400 bg-transparent active:ring-0 focus:ring-0 focus:outline-none"
+            value={myMessage}
+            onChange={(e) => setMyMessage(e.target.value)}
+            placeholder="Chat to generate new domains..."
+          />
+          <SimpleTooltip title="Send">
+            <Button
+              variant="ghost"
+              size="sm"
+              className="whitespace-nowrap text-gray-300"
+              type="submit"
+            >
+              {streamResponse.messageIsStreaming ? (
+                <Spinner />
+              ) : (
+                <Send className="w-5" />
+              )}
+            </Button>
+          </SimpleTooltip>
+        </form>
+      </div>
     </main>
   )
 }
