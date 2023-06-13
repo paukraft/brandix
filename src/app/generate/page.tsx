@@ -12,7 +12,7 @@ import { useStream } from '@/hooks/useStream'
 import { dateToString } from '@/lib/timeAgo'
 import { cn } from '@/lib/utils'
 import { Check, List, Send, Wand2, X } from 'lucide-react'
-import { useEffect, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 
 const domainsStatic: {
   name: string
@@ -45,6 +45,8 @@ const domainsStatic: {
 ]
 
 export default function Home() {
+  const scrollAreaRef = useRef<null | HTMLDivElement>(null)
+
   const [myMessage, setMyMessage] = useState('')
   const [domains, setDomains] = useState<
     {
@@ -72,6 +74,18 @@ export default function Home() {
 
   const { send: sendStream, streamResponse } = useStream()
   const { toast } = useToast()
+
+  const scrollToBottom = () => {
+    if (scrollAreaRef.current) {
+      const scrollArea = scrollAreaRef.current
+      const { scrollHeight, clientHeight } = scrollArea
+
+      scrollArea.scrollTo({
+        top: scrollHeight - clientHeight,
+        behavior: 'smooth',
+      })
+    }
+  }
 
   const send = async (message: string) => {
     sendStream({
@@ -102,7 +116,7 @@ export default function Home() {
           {
             content: message,
             role: 'user',
-          },
+          },r
         ],
       },
     })
@@ -177,6 +191,10 @@ export default function Home() {
     })
   }, [domains])
 
+  useEffect(() => {
+    scrollToBottom()
+  }, [toRender])
+
   return (
     <main className="flex min-h-screen flex-col gap-6 relative">
       <NavBar />
@@ -220,9 +238,23 @@ export default function Home() {
             <X size={16} className="mr-1" />
             Clear All
           </Button>
+
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={() => {
+              scrollToBottom()
+            }}
+          >
+            Scroll to bottom
+          </Button>
         </div>
 
-        <ScrollArea className="h-[60svh]" scrollHideDelay={0}>
+        <ScrollArea
+          ref={scrollAreaRef}
+          className="h-[60svh]"
+          scrollHideDelay={0}
+        >
           {toRender.map((item, i) => {
             // @ts-expect-error Der is dumm
             if (item.domain) {
