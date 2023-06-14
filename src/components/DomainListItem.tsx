@@ -56,8 +56,8 @@ export const DomainListItem = ({
         </div>
       </div>
 
-      <div className="flex gap-4">
-        <div className="md:hidden group-hover/item:flex text-xs gap-2 text-gray-400">
+      <div className="flex gap-3 md:gap-4">
+        <div className="flex md:hidden group-hover/item:flex text-xs gap-1 md:gap-2 text-gray-400">
           <SimpleTooltip title="Mark as favorite">
             <button
               onClick={() => {

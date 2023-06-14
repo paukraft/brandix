@@ -58,10 +58,10 @@ export const DomainExtensionSelect = (props: Props) => {
 
   return (
     <Select value={props.extension} onValueChange={props.setExtension}>
-      <SelectTrigger className="w-[140px] h-9">
+      <SelectTrigger className="w-[80px] h-9">
         <SelectValue placeholder="Select an extension" />
       </SelectTrigger>
-      <SelectContent>
+      <SelectContent className="min-w-0">
         <SelectGroup>
           {extensions.map((extension) => (
             <SelectItem key={extension} value={extension}>
