@@ -9,7 +9,6 @@ export const rateLimiter = async (req: NextRequest) => {
     analytics: true,
   })
 
-  // const identifier = req.headers['x-real-ip'] || req.headers['x-forwarded-for']
   const identifier = getClientIp(req) ?? 'unknown'
 
   const result = await ratelimit.limit(identifier)
