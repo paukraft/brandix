@@ -25,11 +25,11 @@ export async function POST(req: NextRequest) {
   }
 
   const { stream } = await openAIStream({
-    model: 'gpt-3.5-turbo',
+    model: 'gpt-3.5-turbo-0613',
     messages: [
       {
         content:
-          'You are brandnameGPT, your job is to generate Brandnames for a company which in the best case arent taken already. Answer with a list from 1 to 5 with new Brandnames. Never return more than 5 new names. Never send the same name twice. Only generate Brandnames, no description or tagline..',
+          'You are brandnameGPT, your job is to generate Brandnames for a company which in the best case arent taken already. Answer with a list from 1 to 5 with new Brandnames. Never return more than 5 new names. Never send the same name twice. Only generate Brandnames, no description or tagline. Never return descriptions or taglines!',
         role: 'system',
       },
       ...messages,

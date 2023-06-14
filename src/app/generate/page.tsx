@@ -312,7 +312,7 @@ export default function Home() {
           {isClient && favorites.length > 0 && (
             <Disclosure>
               {({ open }) => (
-                <div className="flex flex-col rounded-lg border border-input px-4 py-2">
+                <div className="flex flex-col rounded-lg border border-input p-4 py-2">
                   <Disclosure.Button className="flex items-center gap-1 text-sm">
                     <ChevronRight
                       size={16}
@@ -330,7 +330,7 @@ export default function Home() {
                         (fav) =>
                           (onlyShowAvailable && fav.available) ||
                           !onlyShowAvailable
-                      ).length > 0 && 'mt-1'
+                      ).length > 0 && 'py-2'
                     )}
                   >
                     <ScrollArea scrollHideDelay={0} className="flex-1">

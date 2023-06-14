@@ -60,10 +60,13 @@ async function checkDomainAvailability(
               })
             } else {
               const available =
-                whoisData.includes('No match for domain') ||
+                whoisData.includes('No match') ||
                 whoisData.includes('No Object Found') ||
                 whoisData.includes('Status: free')
-              resolve({ available, whoisResult: 'Domain is available' })
+              resolve({
+                available,
+                whoisResult: available ? 'Domain is available' : whoisData,
+              })
             }
           }
         })
