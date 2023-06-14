@@ -1,9 +1,10 @@
 'use client'
 
 import { BrandExample } from '@/components/BrandExample'
+import { DomainExtensionSelect } from '@/components/DomainExtensionSelect'
+import { DomainListItem } from '@/components/DomainListItem'
 import { MessageBubble } from '@/components/MessageBubble'
 import { NavBar } from '@/components/NavBar'
-import { CopyButton } from '@/components/ui/CopyButton'
 import { SimpleTooltip } from '@/components/ui/SimpleTooltip'
 import { Button } from '@/components/ui/button'
 import { Hr } from '@/components/ui/hr'
@@ -12,15 +13,15 @@ import { Spinner } from '@/components/ui/spinner'
 import { useToast } from '@/components/ui/use-toast'
 import { useStream } from '@/hooks/useStream'
 import { cn } from '@/lib/utils'
+import { Disclosure } from '@headlessui/react'
 import {
   Check,
+  ChevronRight,
   Lightbulb,
   List,
   ListX,
   RotateCcw,
   Send,
-  Star,
-  Wand2,
 } from 'lucide-react'
 import { useEffect, useRef, useState } from 'react'
 import { useLocalStorage } from 'usehooks-ts'
@@ -61,10 +62,11 @@ const brandExamples: BrandExamples = [
   },
 ]
 
-type domain = {
+export type Domain = {
   name: string
   domain: string
   available: boolean
+  onlyProbably?: boolean
   checking: boolean
   cantFigureOutAvailability?: boolean
   createdAt: Date
@@ -76,8 +78,8 @@ export default function Home() {
   const { toast } = useToast()
 
   const [myMessage, setMyMessage] = useState('')
-  const [domains, setDomains] = useState<domain[]>([])
-  const [favorites, setFavorites] = useLocalStorage<domain[]>(
+  const [domains, setDomains] = useState<Domain[]>([])
+  const [favorites, setFavorites] = useLocalStorage<Domain[]>(
     'favoriteDomains',
     []
   )
@@ -102,6 +104,7 @@ export default function Home() {
   )
 
   const [onlyShowAvailable, setOnlyShowAvailable] = useState(false)
+  const [extension, setExtension] = useState('.com')
 
   const { send: sendStream, streamResponse } = useStream()
 
@@ -172,9 +175,10 @@ export default function Home() {
       if (domainIndex === -1) {
         const url =
           domain
+            .trim()
             .toLowerCase()
             .replace(/\s+/g, '-')
-            .replace(/[^a-zA-Z0-9-]+/g, '') + '.com'
+            .replace(/[^a-zA-Z0-9-]+/g, '') + extension
         setDomains((prev) => [
           ...prev,
           {
@@ -217,6 +221,7 @@ export default function Home() {
         checking: false,
         cantFigureOutAvailability: data.available === undefined,
         whois: data.whois,
+        onlyProbably: data.onlyProbably,
       }
 
       return newDomains
@@ -247,225 +252,177 @@ export default function Home() {
         <div className="w-full aspect-square bg-blue-950 rounded-full blur-3xl opacity-10 scale-125" />
       </div>
 
-      <div className="flex flex-col md:mt-4 lg:mt-8 xl:mt-20 max-w-2xl mx-auto w-full gap-2 px-4">
+      <div className="flex flex-col md:mt-4 lg:mt-8 xl:mt-20 max-w-2xl mx-auto w-full gap-3 px-4">
         <div
           className={cn(
-            'invisible flex justify-end gap-2',
+            'flex invisible justify-between gap-2',
             toRender.length > 0 && 'visible'
           )}
         >
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={() => {
-              setOnlyShowAvailable((prev) => !prev)
-            }}
-          >
-            {onlyShowAvailable ? (
-              <List size={16} className="mr-1" />
-            ) : (
-              <Check size={16} className="mr-1" />
-            )}
-            {onlyShowAvailable ? 'Show All' : 'Only show available'}
-          </Button>
+          <DomainExtensionSelect
+            extension={extension}
+            setExtension={setExtension}
+          />
+          <div className={cn('flex gap-2')}>
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => {
+                setOnlyShowAvailable((prev) => !prev)
+              }}
+            >
+              {onlyShowAvailable ? (
+                <List size={16} className="mr-1" />
+              ) : (
+                <Check size={16} className="mr-1" />
+              )}
+              <span className="max-md:hidden">
+                {onlyShowAvailable ? 'Show All' : 'Only show available'}
+              </span>
+              <span className="md:hidden">
+                {onlyShowAvailable ? 'All' : 'Available'}
+              </span>
+            </Button>
 
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={() => {
-              setDomains([])
-              setMessages([])
-              setSystemMessages([])
-            }}
-          >
-            <ListX size={16} className="mr-1" />
-            Clear List
-          </Button>
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => {
+                setDomains([])
+                setMessages([])
+                setSystemMessages([])
+              }}
+            >
+              <ListX size={16} className="mr-1" />
+              Clear <span className="max-md:hidden">List</span>
+            </Button>
+          </div>
         </div>
 
-        <ScrollArea
-          ref={scrollAreaRef}
-          className="h-[60svh]"
-          scrollHideDelay={0}
-        >
-          {toRender.length === 0 && (
-            <div className="h-[60svh]">
-              <div className="mb-2 text-xl flex items-center">
-                <Lightbulb size={20} className="mr-1" />
-                Startingpoints:
-              </div>
-              <div className="w-full grid grid-cols-2 gap-3">
-                {brandExamples.map((item, i) => (
-                  <BrandExample
-                    key={item.title}
-                    brandExample={item}
-                    onClick={() =>
-                      send(`names for ${item.title} ${item.description}`)
-                    }
-                  />
-                ))}
-              </div>
-            </div>
-          )}
-          {toRender.map((item, i) => {
-            // @ts-expect-error Der is dumm
-            if (item.domain) {
-              // @ts-expect-error Der is dumm
-              const domain: (typeof domains)[number] = item
-
-              if (onlyShowAvailable && !domain.available) {
-                return null
-              }
-
-              const isFavorite =
-                favorites.findIndex((item) => item.domain === domain.domain) !==
-                -1
-
-              return (
-                <div
-                  key={domain.name + i} // FIXME: Use a better key
-                  className={cn(
-                    'group/item flex items-center justify-between px-4 py-2 rounded-lg border border-input hover:bg-accent/20 overflow-hidden relative bg-zinc-900/10 shrink-0',
-                    i !== toRender.length - 1 && 'mb-3'
-                  )}
-                >
-                  <div>
-                    <div className="flex items-center">
-                      {domain.name}
-                      <CopyButton
-                        className="ml-2 group-hover/item:block hidden"
-                        text={domain.name}
-                      />
-                    </div>
-
-                    <div className="flex items-center">
-                      <div className="font-light text-sm">
-                        <span className="opacity-60">https://</span>
-                        {domain.domain}
-                      </div>
-                      <CopyButton
-                        className="ml-2 group-hover/item:block hidden"
-                        text={domain.domain}
-                      />
-                    </div>
-                  </div>
-
-                  <div className="flex gap-4">
-                    <div className="hidden group-hover/item:flex text-xs gap-2 text-gray-400">
-                      <SimpleTooltip title="Mark as favorite">
-                        <button
-                          onClick={() => {
-                            if (isFavorite) {
-                              setFavorites((prev) =>
-                                prev.filter(
-                                  (item) => item.domain !== domain.domain
-                                )
-                              )
-                              toast({
-                                title: 'Removed from favorites',
-                              })
-                            } else {
-                              setFavorites((prev) => [...prev, domain])
-                              toast({
-                                title: 'Added to favorites',
-                              })
-                            }
-                          }}
-                        >
-                          <Star
-                            fill={isFavorite ? 'currentColor' : ''}
-                            size={16}
-                          />
-                        </button>
-                      </SimpleTooltip>
-
-                      <SimpleTooltip title="Generate Variations">
-                        <button
-                          onClick={() => {
-                            newSystemMessage(
-                              `Generate variations for ${domain.name}`
-                            )
-                            send(
-                              `Give me 5 more variations similar to ${domain.name}`
-                            )
-                          }}
-                        >
-                          <Wand2 size={16} />
-                        </button>
-                      </SimpleTooltip>
-                    </div>
-                    <SimpleTooltip title={domain.whois}>
-                      {domain.cantFigureOutAvailability ? (
-                        <a
-                          href={`https://domainr.com/?q=${domain.domain}`}
-                          target="_blank"
-                          rel="noreferrer"
-                        >
-                          <div className="flex items-center gap-2 text-gray-400 hover:underline">
-                            <div className="w-1.5 h-1.5 rounded-full bg-gray-400" />
-                            <div className="text-xs">
-                              Unknown probably for Sale
-                            </div>
-                          </div>
-                        </a>
-                      ) : domain.checking ? (
-                        <>
-                          <div className="flex items-center gap-2 relative animate-pulse">
-                            <div className="w-1.5 h-1.5 absolute rounded-full bg-primary animate-ping" />
-                            <div className="w-1.5 h-1.5 rounded-full bg-primary" />
-                            <div className="text-xs">Checking...</div>
-                          </div>
-                        </>
-                      ) : domain.available ? (
-                        <>
-                          {/* <div className="absolute left-0 w-full h-full bg-green-500 opacity-5 blur-lg" /> */}
-                          <div className="flex items-center gap-2 text-green-500">
-                            <div className="w-1.5 h-1.5 rounded-full bg-green-500" />
-                            <div className="text-xs">Available</div>
-                          </div>
-                        </>
-                      ) : (
-                        <div className="flex items-center gap-2 text-red-700">
-                          <div className="w-1.5 h-1.5 rounded-full bg-red-700" />
-                          <div className="text-xs">Not Available</div>
-                        </div>
+        <div className="h-[60svh] flex flex-col gap-3">
+          {/* Favorites */}
+          {favorites.length > 0 && (
+            <Disclosure>
+              {({ open }) => (
+                <div className="flex flex-col rounded-lg border border-input px-4 py-2 gap-1">
+                  <Disclosure.Button className="flex items-center gap-1">
+                    <ChevronRight
+                      size={16}
+                      className={cn(
+                        'transform duration-100',
+                        open && 'rotate-90'
                       )}
-                    </SimpleTooltip>
-                  </div>
+                    />
+                    Favorites ({favorites.length})
+                  </Disclosure.Button>
+                  <Disclosure.Panel className="flex-1 max-h-[50svh] flex flex-col">
+                    <ScrollArea scrollHideDelay={0} className="flex-1">
+                      {favorites.map((domain, i) => {
+                        if (onlyShowAvailable && !domain.available) {
+                          return null
+                        }
+
+                        return (
+                          <DomainListItem
+                            key={domain.domain + 'favorite'}
+                            domain={domain}
+                            isFavorite={true}
+                            newSystemMessage={newSystemMessage}
+                            send={send}
+                            setFavorites={setFavorites}
+                            isLast={i === favorites.length - 1}
+                          />
+                        )
+                      })}
+                    </ScrollArea>
+                  </Disclosure.Panel>
                 </div>
-              )
-            }
+              )}
+            </Disclosure>
+          )}
 
-            // @ts-expect-error Der is dumm
-            if (item.role === 'user') {
+          <ScrollArea
+            ref={scrollAreaRef}
+            className="flex-1"
+            scrollHideDelay={0}
+          >
+            {toRender.length === 0 && (
+              <div className="">
+                <div className="mb-2 text-xl flex items-center">
+                  <Lightbulb size={20} className="mr-1" />
+                  Startingpoints:
+                </div>
+                <div className="w-full grid grid-cols-2 gap-3">
+                  {brandExamples.map((item, i) => (
+                    <BrandExample
+                      key={item.title}
+                      brandExample={item}
+                      onClick={() =>
+                        send(`names for ${item.title} ${item.description}`)
+                      }
+                    />
+                  ))}
+                </div>
+              </div>
+            )}
+            {toRender.map((item, i) => {
               // @ts-expect-error Der is dumm
-              const message: (typeof messages)[number] = item
-              return (
-                <MessageBubble
-                  key={message.createdAt.getTime()}
-                  className={cn(i !== toRender.length - 1 && 'mb-3')}
-                  message={message}
-                />
-              )
-            }
+              if (item.domain) {
+                // @ts-expect-error Der is dumm
+                const domain: (typeof domains)[number] = item
 
-            // @ts-expect-error Der is dumm
-            if (item.message) {
-              // @ts-expect-error Der is dumm
-              const systemMessage: (typeof systemMessages)[number] = item
+                if (onlyShowAvailable && !domain.available) {
+                  return null
+                }
 
-              if (onlyShowAvailable) {
-                return null
+                const isFavorite =
+                  favorites.findIndex(
+                    (item) => item.domain === domain.domain
+                  ) !== -1
+
+                return (
+                  <DomainListItem
+                    key={domain.domain}
+                    domain={domain}
+                    newSystemMessage={newSystemMessage}
+                    send={send}
+                    isFavorite={isFavorite}
+                    setFavorites={setFavorites}
+                  />
+                )
               }
 
-              return (
-                <div key={item.createdAt.getTime()} className={cn('-mt-3')}>
-                  <Hr>{systemMessage.message}</Hr>
-                </div>
-              )
-            }
-          })}
-        </ScrollArea>
+              // @ts-expect-error Der is dumm
+              if (item.role === 'user') {
+                // @ts-expect-error Der is dumm
+                const message: (typeof messages)[number] = item
+                return (
+                  <MessageBubble
+                    key={message.createdAt.getTime()}
+                    className={cn(i !== toRender.length - 1 && 'mb-3')}
+                    message={message}
+                  />
+                )
+              }
+
+              // @ts-expect-error Der is dumm
+              if (item.message) {
+                // @ts-expect-error Der is dumm
+                const systemMessage: (typeof systemMessages)[number] = item
+
+                if (onlyShowAvailable) {
+                  return null
+                }
+
+                return (
+                  <div key={item.createdAt.getTime()} className={cn('-mt-3')}>
+                    <Hr>{systemMessage.message}</Hr>
+                  </div>
+                )
+              }
+            })}
+          </ScrollArea>
+        </div>
       </div>
 
       {/* Input */}

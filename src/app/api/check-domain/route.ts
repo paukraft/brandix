@@ -22,6 +22,7 @@ export async function POST(req: Request) {
     return NextResponse.json({
       available: data.available,
       whois: data.whoisResult,
+      onlyProbably: data.onlyProbably,
     })
   } catch (error) {
     return NextResponse.json({})
@@ -31,6 +32,7 @@ export async function POST(req: Request) {
 type DomainAvailability = {
   available: boolean
   whoisResult: string
+  onlyProbably?: boolean
 }
 
 async function checkDomainAvailability(
@@ -44,8 +46,20 @@ async function checkDomainAvailability(
           if (whoisErr) {
             reject(whoisErr)
           } else {
-            const available = whoisData.includes('No match for domain')
-            resolve({ available, whoisResult: whoisData })
+            if (whoisData.includes('Lookup quota exceeded')) {
+              resolve({
+                available: true,
+                whoisResult:
+                  'We can only handle a limited amount of certain domain checks.',
+                onlyProbably: true,
+              })
+            } else {
+              const available =
+                whoisData.includes('No match for domain') ||
+                whoisData.includes('No Object Found') ||
+                whoisData.includes('Status: free')
+              resolve({ available, whoisResult: whoisData })
+            }
           }
         })
       } else if (address) {
