@@ -1,5 +1,6 @@
+import { rateLimiter } from '@/lib/rateLimiter'
 import * as dns from 'dns'
-import { NextResponse } from 'next/server'
+import { NextRequest, NextResponse } from 'next/server'
 // @ts-expect-error - no types
 import * as whois from 'whois'
 import { z } from 'zod'
@@ -10,11 +11,15 @@ const inputSchema = z.object({
   domain: z.string(),
 })
 
-export async function POST(req: Request) {
+export async function POST(req: NextRequest) {
   const body = await req.json()
   const { domain } = inputSchema.parse(body)
 
-  console.log('checking', domain)
+  const { success } = await rateLimiter(req)
+
+  if (!success) {
+    return new Response('Rate limit exceeded', { status: 429 })
+  }
 
   try {
     const data = await checkDomainAvailability(domain)

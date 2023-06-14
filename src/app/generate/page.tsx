@@ -205,6 +205,10 @@ export default function Home() {
     })
 
     if (!response.ok) {
+      toast({
+        title: 'Error',
+        description: response.statusText,
+      })
       return
     }
 

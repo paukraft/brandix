@@ -1,4 +1,6 @@
 import { openAIStream } from '@/lib/openAiStream'
+import { rateLimiter } from '@/lib/rateLimiter'
+import { NextRequest } from 'next/server'
 import { z } from 'zod'
 
 export const dynamic = 'force-dynamic'
@@ -12,9 +14,15 @@ const inputSchema = z.object({
   ),
 })
 
-export async function POST(req: Request) {
+export async function POST(req: NextRequest) {
   const body = await req.json()
   const { messages } = inputSchema.parse(body)
+
+  const { success } = await rateLimiter(req)
+
+  if (!success) {
+    return new Response('Rate limit exceeded', { status: 429 })
+  }
 
   const { stream } = await openAIStream({
     model: 'gpt-3.5-turbo',

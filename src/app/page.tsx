@@ -18,9 +18,9 @@ export default function Home() {
       {/* Hero */}
       <div className="px-4 container mx-auto flex items-center flex-col mt-20 gap-6">
         <Link href="/generate">
-          <Button variant="outline" className="rounded-full">
+          <Button variant="outline" className="rounded-full group/generate">
             Generate for free
-            <ArrowRight className="ml-2 w-4" />
+            <ArrowRight className="ml-2 w-4 group-hover/generate:translate-x-1 duration-100" />
           </Button>
         </Link>
 

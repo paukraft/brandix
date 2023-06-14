@@ -26,10 +26,18 @@ export const useStream = () => {
       setStreamResponse({ responseString: '', messageIsStreaming: false })
       const errorMessage = await response.text()
 
-      toast({
-        title: 'Error while generating your results. Please try again later.',
-        description: errorMessage,
-      })
+      if (response.status === 429) {
+        toast({
+          title: 'Error',
+          description:
+            'You have reached the limit of requests. Please try again later.',
+        })
+      } else {
+        toast({
+          title: 'Error while generating your results. Please try again later.',
+          description: errorMessage,
+        })
+      }
       return
     }
 
