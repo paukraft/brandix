@@ -4,7 +4,7 @@ import { BrandExample } from '@/components/BrandExample'
 import { DomainExtensionSelect } from '@/components/DomainExtensionSelect'
 import { DomainListItem } from '@/components/DomainListItem'
 import { MessageBubble } from '@/components/MessageBubble'
-import { NavBar } from '@/components/NavBar'
+import { OwnNameDialog } from '@/components/OwnNameDialog'
 import { SimpleTooltip } from '@/components/ui/SimpleTooltip'
 import { Button } from '@/components/ui/button'
 import { Hr } from '@/components/ui/hr'
@@ -24,7 +24,7 @@ import {
   Send,
 } from 'lucide-react'
 import { useEffect, useRef, useState } from 'react'
-import { useLocalStorage } from 'usehooks-ts'
+import { useIsClient, useLocalStorage } from 'usehooks-ts'
 
 type BrandExamples = {
   title: string
@@ -76,6 +76,7 @@ export type Domain = {
 export default function Home() {
   const scrollAreaRef = useRef<null | HTMLDivElement>(null)
   const { toast } = useToast()
+  const isClient = useIsClient()
 
   const [myMessage, setMyMessage] = useState('')
   const [domains, setDomains] = useState<Domain[]>([])
@@ -153,6 +154,32 @@ export default function Home() {
     })
   }
 
+  const getUrl = (brandname: string) => {
+    return (
+      brandname
+        .trim()
+        .toLowerCase()
+        .replace(/\s+/g, '-')
+        .replace(/[^a-zA-Z0-9-]+/g, '') + extension
+    )
+  }
+
+  const createNewDomain = (brandname: string) => {
+    const url = getUrl(brandname)
+    setDomains((prev) => [
+      ...prev,
+      {
+        name: brandname,
+        domain: url,
+        available: false,
+        checking: true,
+        createdAt: new Date(),
+      },
+    ])
+
+    checkDomain(url)
+  }
+
   useEffect(() => {
     const splited = streamResponse.responseString
       .split('\n')
@@ -173,24 +200,7 @@ export default function Home() {
       const domainIndex = domains.findIndex((item) => item.name === domain)
 
       if (domainIndex === -1) {
-        const url =
-          domain
-            .trim()
-            .toLowerCase()
-            .replace(/\s+/g, '-')
-            .replace(/[^a-zA-Z0-9-]+/g, '') + extension
-        setDomains((prev) => [
-          ...prev,
-          {
-            name: domain,
-            domain: url,
-            available: false,
-            checking: true,
-            createdAt: new Date(),
-          },
-        ])
-
-        checkDomain(url)
+        createNewDomain(domain)
       }
     })
   }, [streamResponse])
@@ -247,15 +257,7 @@ export default function Home() {
   }, [toRender])
 
   return (
-    <main className="flex min-h-screen flex-col gap-6 relative">
-      <NavBar />
-
-      {/* Blob container */}
-      <div className="fixed top-0 -translate-y-1/2 container w-full right-0 left-0 overflow-visible pointer-events-none">
-        {/* Blob */}
-        <div className="w-full aspect-square bg-blue-950 rounded-full blur-3xl opacity-10 scale-125" />
-      </div>
-
+    <>
       <div className="flex flex-col md:mt-4 lg:mt-8 xl:mt-20 max-w-2xl mx-auto w-full gap-3 px-4">
         <div
           className={cn(
@@ -268,6 +270,8 @@ export default function Home() {
             setExtension={setExtension}
           />
           <div className={cn('flex gap-2')}>
+            <OwnNameDialog createNewDomain={createNewDomain} />
+
             <Button
               variant="outline"
               size="sm"
@@ -305,11 +309,11 @@ export default function Home() {
 
         <div className="h-[60svh] flex flex-col gap-3">
           {/* Favorites */}
-          {favorites.length > 0 && (
+          {isClient && favorites.length > 0 && (
             <Disclosure>
               {({ open }) => (
-                <div className="flex flex-col rounded-lg border border-input px-4 py-2 gap-1">
-                  <Disclosure.Button className="flex items-center gap-1">
+                <div className="flex flex-col rounded-lg border border-input px-4 py-2">
+                  <Disclosure.Button className="flex items-center gap-1 text-sm">
                     <ChevronRight
                       size={16}
                       className={cn(
@@ -319,7 +323,16 @@ export default function Home() {
                     />
                     Favorites ({favorites.length})
                   </Disclosure.Button>
-                  <Disclosure.Panel className="flex-1 max-h-[50svh] flex flex-col">
+                  <Disclosure.Panel
+                    className={cn(
+                      'flex-1 max-h-[50svh] flex flex-col',
+                      favorites.filter(
+                        (fav) =>
+                          (onlyShowAvailable && fav.available) ||
+                          !onlyShowAvailable
+                      ).length > 0 && 'mt-1'
+                    )}
+                  >
                     <ScrollArea scrollHideDelay={0} className="flex-1">
                       {favorites.map((domain, i) => {
                         if (onlyShowAvailable && !domain.available) {
@@ -461,7 +474,7 @@ export default function Home() {
             <Button
               variant="ghost"
               size="sm"
-              className="whitespace-nowrap text-gray-300"
+              className="whitespace-nowrap dark:text-gray-300"
               type="submit"
               disabled={streamResponse.messageIsStreaming}
             >
@@ -497,6 +510,6 @@ export default function Home() {
           </SimpleTooltip>
         )}
       </div>
-    </main>
+    </>
   )
 }

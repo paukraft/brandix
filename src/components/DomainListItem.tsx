@@ -29,7 +29,7 @@ export const DomainListItem = ({
     <div
       key={domain.name}
       className={cn(
-        'group/item flex items-center justify-between px-4 py-2 rounded-lg border border-input hover:bg-accent/20 overflow-hidden relative bg-zinc-900/10 shrink-0',
+        'group/item flex items-center justify-between px-4 py-2 rounded-lg border border-input hover:bg-accent/20 overflow-hidden relative dark:bg-zinc-900/10 shrink-0',
         !isLast && 'mb-3'
       )}
     >
@@ -57,8 +57,10 @@ export const DomainListItem = ({
       </div>
 
       <div className="flex gap-3 md:gap-4">
-        <div className="flex md:hidden group-hover/item:flex text-xs gap-1 md:gap-2 text-gray-400">
-          <SimpleTooltip title="Mark as favorite">
+        <div className="flex md:hidden group-hover/item:flex text-xs gap-1 md:gap-2 dark:text-gray-400">
+          <SimpleTooltip
+            title={isFavorite ? 'Remove from favorites' : 'Add to favorites'}
+          >
             <button
               onClick={() => {
                 if (isFavorite) {
@@ -76,7 +78,7 @@ export const DomainListItem = ({
                 }
               }}
             >
-              <Star fill={isFavorite ? 'currentColor' : ''} size={16} />
+              <Star fill={isFavorite ? 'currentColor' : 'none'} size={16} />
             </button>
           </SimpleTooltip>
 

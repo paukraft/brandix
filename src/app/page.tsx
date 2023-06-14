@@ -1,20 +1,10 @@
-import { NavBar } from '@/components/NavBar'
 import { Button } from '@/components/ui/button'
 import { ArrowRight } from 'lucide-react'
 import Link from 'next/link'
 
 export default function Home() {
   return (
-    <main className="flex min-h-screen flex-col">
-      {/* Blob container */}
-      <div className="fixed top-0 -translate-y-1/2 container w-full right-0 left-0 overflow-visible pointer-events-none">
-        {/* Blob */}
-        <div className="w-full aspect-square bg-blue-950 rounded-full blur-3xl opacity-10 scale-125" />
-      </div>
-
-      {/* NavBar */}
-      <NavBar />
-
+    <>
       {/* Hero */}
       <div className="px-4 container mx-auto flex items-center flex-col mt-20 gap-6">
         <Link href="/generate">
@@ -38,6 +28,6 @@ export default function Home() {
           we also instantly check the domain availability for you.
         </div>
       </div>
-    </main>
+    </>
   )
 }

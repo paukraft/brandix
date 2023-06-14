@@ -63,7 +63,7 @@ async function checkDomainAvailability(
                 whoisData.includes('No match for domain') ||
                 whoisData.includes('No Object Found') ||
                 whoisData.includes('Status: free')
-              resolve({ available, whoisResult: whoisData })
+              resolve({ available, whoisResult: 'Domain is available' })
             }
           }
         })
