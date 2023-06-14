@@ -1,62 +1,86 @@
 'use client'
 
+import { BrandExample } from '@/components/BrandExample'
+import { MessageBubble } from '@/components/MessageBubble'
 import { NavBar } from '@/components/NavBar'
-import { TimeAgo } from '@/components/TimeAgo'
 import { CopyButton } from '@/components/ui/CopyButton'
 import { SimpleTooltip } from '@/components/ui/SimpleTooltip'
 import { Button } from '@/components/ui/button'
+import { Hr } from '@/components/ui/hr'
 import { ScrollArea } from '@/components/ui/scroll-area'
 import { Spinner } from '@/components/ui/spinner'
 import { useToast } from '@/components/ui/use-toast'
 import { useStream } from '@/hooks/useStream'
-import { dateToString } from '@/lib/timeAgo'
 import { cn } from '@/lib/utils'
-import { Check, List, Send, Wand2, X } from 'lucide-react'
+import {
+  Check,
+  Lightbulb,
+  List,
+  ListX,
+  RotateCcw,
+  Send,
+  Star,
+  Wand2,
+} from 'lucide-react'
 import { useEffect, useRef, useState } from 'react'
+import { useLocalStorage } from 'usehooks-ts'
 
-const domainsStatic: {
+type BrandExamples = {
+  title: string
+  description: string
+}[]
+
+const brandExamples: BrandExamples = [
+  {
+    title: 'Brandable names',
+    description: 'like Kodak and Adidas',
+  },
+  {
+    title: 'Alternate spelling',
+    description: 'like Digg and Flickr',
+  },
+  {
+    title: 'Non-English words',
+    description: 'like Huawei and IKEA',
+  },
+  {
+    title: 'Compound words',
+    description: 'like Instagram and MasterCard',
+  },
+  {
+    title: 'Real words',
+    description: 'like Oracle and Slack',
+  },
+  {
+    title: 'Two words',
+    description: 'like Coca-Cola and General Motors',
+  },
+  {
+    title: 'Short phrase',
+    description: 'like The Home Depot and Best Buy',
+  },
+]
+
+type domain = {
   name: string
   domain: string
   available: boolean
   checking: boolean
+  cantFigureOutAvailability?: boolean
   createdAt: Date
-}[] = [
-  {
-    name: 'Tangled',
-    domain: 'tangled.com',
-    available: false,
-    checking: true,
-    createdAt: new Date(),
-  },
-  {
-    name: 'Tangled',
-    domain: 'tangled.com',
-    available: false,
-    checking: false,
-    createdAt: new Date(),
-  },
-  {
-    name: 'Tangled',
-    domain: 'tangled.com',
-    available: true,
-    checking: false,
-    createdAt: new Date(),
-  },
-]
+  whois?: string
+}
 
 export default function Home() {
   const scrollAreaRef = useRef<null | HTMLDivElement>(null)
+  const { toast } = useToast()
 
   const [myMessage, setMyMessage] = useState('')
-  const [domains, setDomains] = useState<
-    {
-      name: string
-      domain: string
-      available: boolean
-      checking: boolean
-      createdAt: Date
-    }[]
-  >([])
+  const [domains, setDomains] = useState<domain[]>([])
+  const [favorites, setFavorites] = useLocalStorage<domain[]>(
+    'favoriteDomains',
+    []
+  )
 
   const [messages, setMessages] = useState<
     {
@@ -66,14 +90,20 @@ export default function Home() {
     }[]
   >([])
 
-  const toRender = [...messages, ...domains].sort(
+  const [systemMessages, setSystemMessages] = useState<
+    {
+      message: string
+      createdAt: Date
+    }[]
+  >([])
+
+  const toRender = [...messages, ...domains, ...systemMessages].sort(
     (a, b) => a.createdAt.getTime() - b.createdAt.getTime()
   )
 
   const [onlyShowAvailable, setOnlyShowAvailable] = useState(false)
 
   const { send: sendStream, streamResponse } = useStream()
-  const { toast } = useToast()
 
   const scrollToBottom = () => {
     if (scrollAreaRef.current) {
@@ -82,37 +112,35 @@ export default function Home() {
 
       scrollArea.scrollTo({
         top: scrollHeight - clientHeight,
-        behavior: 'smooth',
+        behavior: 'auto',
       })
     }
   }
 
   const send = async (message: string) => {
+    const groupedMessages = toRender.reduce((acc, item, i) => {
+      // @ts-expect-error Der is dumm
+      if (item.role === 'user') {
+        // @ts-expect-error Der is dumm
+        acc.push({ content: item.content, role: 'user' })
+      } else {
+        // @ts-expect-error Der is dumm
+        if (acc.length === 0 || acc[acc.length - 1].role === 'user') {
+          // @ts-expect-error Der is dumm
+          acc.push({ content: `${i}. ${item.name}`, role: 'assistant' })
+        } else {
+          // @ts-expect-error Der is dumm
+          acc[acc.length - 1].content += `\n${i}. ${item.name}`
+        }
+      }
+      return acc
+    }, [])
+
     sendStream({
       url: '/api/generate',
       body: {
         messages: [
-          ...toRender.map((item, i) => {
-            // @ts-expect-error Der is dumm
-            if (item.domain) {
-              // @ts-expect-error Der is dumm
-              const domain: (typeof domains)[number] = item
-              return {
-                content: `${i}. ${domain.name}`,
-                role: 'assistant',
-              }
-            }
-
-            // @ts-expect-error Der is dumm
-            if (item.role === 'user') {
-              // @ts-expect-error Der is dumm
-              const message: (typeof messages)[number] = item
-              return {
-                content: message.content,
-                role: 'user',
-              }
-            }
-          }),
+          ...groupedMessages,
           {
             content: message,
             role: 'user',
@@ -133,6 +161,7 @@ export default function Home() {
       streamResponse.messageIsStreaming ? sliced : splited
     ).map((item) => item.replace(/^\d+\.\s/, ''))
 
+    // Debugging
     if (!streamResponse.messageIsStreaming) {
       console.log(streamResponse.responseString)
     }
@@ -141,55 +170,68 @@ export default function Home() {
       const domainIndex = domains.findIndex((item) => item.name === domain)
 
       if (domainIndex === -1) {
+        const url =
+          domain
+            .toLowerCase()
+            .replace(/\s+/g, '-')
+            .replace(/[^a-zA-Z0-9-]+/g, '') + '.com'
         setDomains((prev) => [
           ...prev,
           {
             name: domain,
-            domain:
-              domain
-                .toLowerCase()
-                .replace(/\s+/g, '-')
-                .replace(/[^a-zA-Z0-9-]+/g, '') + '.com',
+            domain: url,
             available: false,
             checking: true,
             createdAt: new Date(),
           },
         ])
+
+        checkDomain(url)
       }
     })
   }, [streamResponse])
 
-  useEffect(() => {
-    domains.forEach(async (domain, i) => {
-      if (domain.checking) {
-        const response = await fetch('/api/check-domain', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify({ domain: domain.domain }),
-        })
-
-        if (!response.ok) {
-          return
-        }
-
-        const data = await response.json()
-
-        setDomains((prev) => {
-          const newDomains = [...prev]
-
-          newDomains[i] = {
-            ...newDomains[i],
-            available: data.available,
-            checking: false,
-          }
-
-          return newDomains
-        })
-      }
+  const checkDomain = async (domain: string) => {
+    const response = await fetch('/api/check-domain', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ domain: domain }),
     })
-  }, [domains])
+
+    if (!response.ok) {
+      return
+    }
+
+    const data = await response.json()
+
+    setDomains((prev) => {
+      const newDomains = [...prev]
+
+      const i = newDomains.findIndex((item) => item.domain === domain)
+
+      newDomains[i] = {
+        ...newDomains[i],
+        available: data.available,
+        checking: false,
+        cantFigureOutAvailability: data.available === undefined,
+        whois: data.whois,
+      }
+
+      return newDomains
+    })
+  }
+
+  const newSystemMessage = (message: string) => {
+    setSystemMessages((prev) => [
+      ...prev,
+      {
+        message,
+        createdAt: new Date(),
+      },
+    ])
+  }
 
   useEffect(() => {
     scrollToBottom()
@@ -233,20 +275,11 @@ export default function Home() {
             onClick={() => {
               setDomains([])
               setMessages([])
+              setSystemMessages([])
             }}
           >
-            <X size={16} className="mr-1" />
-            Clear All
-          </Button>
-
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={() => {
-              scrollToBottom()
-            }}
-          >
-            Scroll to bottom
+            <ListX size={16} className="mr-1" />
+            Clear List
           </Button>
         </div>
 
@@ -255,6 +288,25 @@ export default function Home() {
           className="h-[60svh]"
           scrollHideDelay={0}
         >
+          {toRender.length === 0 && (
+            <div className="h-[60svh]">
+              <div className="mb-2 text-xl flex items-center">
+                <Lightbulb size={20} className="mr-1" />
+                Startingpoints:
+              </div>
+              <div className="w-full grid grid-cols-2 gap-3">
+                {brandExamples.map((item, i) => (
+                  <BrandExample
+                    key={item.title}
+                    brandExample={item}
+                    onClick={() =>
+                      send(`names for ${item.title} ${item.description}`)
+                    }
+                  />
+                ))}
+              </div>
+            </div>
+          )}
           {toRender.map((item, i) => {
             // @ts-expect-error Der is dumm
             if (item.domain) {
@@ -264,6 +316,11 @@ export default function Home() {
               if (onlyShowAvailable && !domain.available) {
                 return null
               }
+
+              const isFavorite =
+                favorites.findIndex((item) => item.domain === domain.domain) !==
+                -1
+
               return (
                 <div
                   key={domain.name + i} // FIXME: Use a better key
@@ -294,39 +351,86 @@ export default function Home() {
                   </div>
 
                   <div className="flex gap-4">
-                    <div className="hidden group-hover/item:flex text-xs gap-1 text-gray-400">
-                      <SimpleTooltip title="Make Variation">
+                    <div className="hidden group-hover/item:flex text-xs gap-2 text-gray-400">
+                      <SimpleTooltip title="Mark as favorite">
                         <button
-                          onClick={() =>
-                            send(`Give me more variations like ${domain.name}`)
-                          }
+                          onClick={() => {
+                            if (isFavorite) {
+                              setFavorites((prev) =>
+                                prev.filter(
+                                  (item) => item.domain !== domain.domain
+                                )
+                              )
+                              toast({
+                                title: 'Removed from favorites',
+                              })
+                            } else {
+                              setFavorites((prev) => [...prev, domain])
+                              toast({
+                                title: 'Added to favorites',
+                              })
+                            }
+                          }}
+                        >
+                          <Star
+                            fill={isFavorite ? 'currentColor' : ''}
+                            size={16}
+                          />
+                        </button>
+                      </SimpleTooltip>
+
+                      <SimpleTooltip title="Generate Variations">
+                        <button
+                          onClick={() => {
+                            newSystemMessage(
+                              `Generate variations for ${domain.name}`
+                            )
+                            send(
+                              `Give me 5 more variations similar to ${domain.name}`
+                            )
+                          }}
                         >
                           <Wand2 size={16} />
                         </button>
                       </SimpleTooltip>
                     </div>
-                    {domain.checking ? (
-                      <>
-                        <div className="flex items-center gap-2 relative animate-pulse">
-                          <div className="w-1.5 h-1.5 absolute rounded-full bg-primary animate-ping" />
-                          <div className="w-1.5 h-1.5 rounded-full bg-primary" />
-                          <div className="text-xs">Checking...</div>
+                    <SimpleTooltip title={domain.whois}>
+                      {domain.cantFigureOutAvailability ? (
+                        <a
+                          href={`https://domainr.com/?q=${domain.domain}`}
+                          target="_blank"
+                          rel="noreferrer"
+                        >
+                          <div className="flex items-center gap-2 text-gray-400 hover:underline">
+                            <div className="w-1.5 h-1.5 rounded-full bg-gray-400" />
+                            <div className="text-xs">
+                              Unknown probably for Sale
+                            </div>
+                          </div>
+                        </a>
+                      ) : domain.checking ? (
+                        <>
+                          <div className="flex items-center gap-2 relative animate-pulse">
+                            <div className="w-1.5 h-1.5 absolute rounded-full bg-primary animate-ping" />
+                            <div className="w-1.5 h-1.5 rounded-full bg-primary" />
+                            <div className="text-xs">Checking...</div>
+                          </div>
+                        </>
+                      ) : domain.available ? (
+                        <>
+                          {/* <div className="absolute left-0 w-full h-full bg-green-500 opacity-5 blur-lg" /> */}
+                          <div className="flex items-center gap-2 text-green-500">
+                            <div className="w-1.5 h-1.5 rounded-full bg-green-500" />
+                            <div className="text-xs">Available</div>
+                          </div>
+                        </>
+                      ) : (
+                        <div className="flex items-center gap-2 text-red-700">
+                          <div className="w-1.5 h-1.5 rounded-full bg-red-700" />
+                          <div className="text-xs">Not Available</div>
                         </div>
-                      </>
-                    ) : domain.available ? (
-                      <>
-                        {/* <div className="absolute left-0 w-full h-full bg-green-500 opacity-5 blur-lg" /> */}
-                        <div className="flex items-center gap-2 text-green-500">
-                          <div className="w-1.5 h-1.5 rounded-full bg-green-500" />
-                          <div className="text-xs">Available</div>
-                        </div>
-                      </>
-                    ) : (
-                      <div className="flex items-center gap-2 text-red-700">
-                        <div className="w-1.5 h-1.5 rounded-full bg-red-700" />
-                        <div className="text-xs">Not Available</div>
-                      </div>
-                    )}
+                      )}
+                    </SimpleTooltip>
                   </div>
                 </div>
               )
@@ -337,29 +441,26 @@ export default function Home() {
               // @ts-expect-error Der is dumm
               const message: (typeof messages)[number] = item
               return (
-                <div
-                  key={item.createdAt.getTime()}
-                  className={cn(
-                    'flex flex-col gap-1',
-                    i !== toRender.length - 1 && 'mb-3'
-                  )}
-                >
-                  <div className={cn('flex max-w-full items-end gap-1.5')}>
-                    <div className={cn('flex max-w-full items-center gap-1.5')}>
-                      <div className="min-w-0 text-sm font-medium text-gray-200">
-                        You
-                      </div>
-                      <div
-                        className="text-xs font-light text-gray-400"
-                        title={dateToString(message.createdAt)}
-                      >
-                        <TimeAgo date={message.createdAt} />
-                      </div>
-                    </div>
-                  </div>
-                  <div className="flex items-center py-2 px-4 rounded-lg bg-slate-800 shrink-0 text-gray-300 w-fit rounded-tl-none">
-                    „{message.content}“
-                  </div>
+                <MessageBubble
+                  key={message.createdAt.getTime()}
+                  className={cn(i !== toRender.length - 1 && 'mb-3')}
+                  message={message}
+                />
+              )
+            }
+
+            // @ts-expect-error Der is dumm
+            if (item.message) {
+              // @ts-expect-error Der is dumm
+              const systemMessage: (typeof systemMessages)[number] = item
+
+              if (onlyShowAvailable) {
+                return null
+              }
+
+              return (
+                <div key={item.createdAt.getTime()} className={cn('-mt-3')}>
+                  <Hr>{systemMessage.message}</Hr>
                 </div>
               )
             }
@@ -368,12 +469,13 @@ export default function Home() {
       </div>
 
       {/* Input */}
-      <div className="max-w-2xl mx-auto w-full px-4">
+      <div className="max-w-2xl mx-auto w-full px-4 flex gap-2">
         <form
           className="border border-input rounded-lg flex items-center w-full px-4"
           onSubmit={(e) => {
             e.preventDefault()
-            send(`${myMessage} give me 5 brandname suggestions`)
+            if (streamResponse.messageIsStreaming) return
+            send(`${myMessage} give me 5 brandname suggestions in a list`)
             setMessages((prev) => [
               ...prev,
               {
@@ -387,10 +489,10 @@ export default function Home() {
         >
           <input
             type="text"
-            className="w-full h-12 text-base font-light placeholder-gray-400 bg-transparent active:ring-0 focus:ring-0 focus:outline-none"
+            className="w-full h-12 text-base font-light placeholder:text-muted-foreground bg-transparent active:ring-0 focus:ring-0 focus:outline-none"
             value={myMessage}
             onChange={(e) => setMyMessage(e.target.value)}
-            placeholder="Chat to generate new domains..."
+            placeholder="Chat to generate new names..."
           />
           <SimpleTooltip title="Send">
             <Button
@@ -398,15 +500,39 @@ export default function Home() {
               size="sm"
               className="whitespace-nowrap text-gray-300"
               type="submit"
+              disabled={streamResponse.messageIsStreaming}
             >
               {streamResponse.messageIsStreaming ? (
-                <Spinner />
+                <Spinner className="w-5 h-5" />
               ) : (
-                <Send className="w-5" />
+                <Send className="w-5 h-5" />
               )}
             </Button>
           </SimpleTooltip>
         </form>
+
+        {toRender.length > 0 && (
+          <SimpleTooltip title="Generate more">
+            <Button
+              variant="outline"
+              className="py-6 rounded-lg"
+              // disabled={streamResponse.messageIsStreaming}
+              onClick={() => {
+                if (streamResponse.messageIsStreaming) return
+                newSystemMessage('Generate more')
+                send(
+                  `give me 5 more suggestions similar to the latest ones in a list`
+                )
+              }}
+            >
+              {streamResponse.messageIsStreaming ? (
+                <Spinner className="w-5 h-5" />
+              ) : (
+                <RotateCcw className="w-5 h-5" />
+              )}
+            </Button>
+          </SimpleTooltip>
+        )}
       </div>
     </main>
   )

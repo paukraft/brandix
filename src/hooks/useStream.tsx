@@ -12,7 +12,7 @@ export const useStream = () => {
   const { toast } = useToast()
 
   const send = async ({ url, body }: { url: string; body?: object }) => {
-    setStreamResponse({ responseString: '', messageIsStreaming: false })
+    setStreamResponse({ responseString: '', messageIsStreaming: true })
 
     const response = await fetch(url, {
       method: 'POST',
@@ -23,10 +23,11 @@ export const useStream = () => {
     })
 
     if (!response.ok) {
+      setStreamResponse({ responseString: '', messageIsStreaming: false })
       const errorMessage = await response.text()
 
       toast({
-        title: 'Error',
+        title: 'Error while generating your results. Please try again later.',
         description: errorMessage,
       })
       return

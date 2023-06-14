@@ -16,8 +16,6 @@ export async function POST(req: Request) {
   const body = await req.json()
   const { messages } = inputSchema.parse(body)
 
-  console.log(messages)
-
   const { stream } = await openAIStream({
     model: 'gpt-3.5-turbo',
     messages: [
