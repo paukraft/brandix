@@ -436,7 +436,9 @@ export default function Home() {
           onSubmit={(e) => {
             e.preventDefault()
             if (streamResponse.messageIsStreaming) return
-            send(`${myMessage} give me 5 brandname suggestions in a list`)
+            send(
+              `${myMessage} give me 5 brandname suggestions in a list, only brandnames no description or tagline`
+            )
             setMessages((prev) => [
               ...prev,
               {
@@ -482,7 +484,7 @@ export default function Home() {
                 if (streamResponse.messageIsStreaming) return
                 newSystemMessage('Generate more')
                 send(
-                  `give me 5 more suggestions similar to the latest ones in a list`
+                  `give me 5 more suggestions similar to the latest ones in a list, only brandnames no description or tagline`
                 )
               }}
             >

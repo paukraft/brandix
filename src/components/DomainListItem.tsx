@@ -84,7 +84,9 @@ export const DomainListItem = ({
             <button
               onClick={() => {
                 newSystemMessage(`Generate variations for ${domain.name}`)
-                send(`Give me 5 more variations similar to ${domain.name}`)
+                send(
+                  `Give me 5 more variations similar to ${domain.name}, only brandnames no description or tagline`
+                )
               }}
             >
               <Wand2 size={16} />
