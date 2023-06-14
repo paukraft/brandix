@@ -1,4 +1,5 @@
 import { Toaster } from '@/components/ui/Toaster'
+import { Analytics } from '@vercel/analytics/react'
 import { Inter } from 'next/font/google'
 import './globals.css'
 
@@ -19,6 +20,7 @@ export default function RootLayout({
       <body className={inter.className}>
         {children}
         <Toaster />
+        <Analytics />
       </body>
     </html>
   )
