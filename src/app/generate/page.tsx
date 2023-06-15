@@ -365,9 +365,9 @@ export default function Home() {
           >
             {toRender.length === 0 && (
               <div className="">
-                <div className="mb-2 text-xl flex items-center">
+                <div className="mb-2 text-xl flex items-center mt-2">
                   <Lightbulb size={20} className="mr-1" />
-                  Startingpoints:
+                  Suggestions
                 </div>
                 <div className="w-full grid grid-cols-2 gap-3">
                   {brandExamples.map((item, i) => (
