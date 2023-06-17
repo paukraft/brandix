@@ -22,8 +22,10 @@ export const OwnNameDialog = ({ createNewDomain }: Props) => {
   const [open, setOpen] = useState(false)
   const [error, setError] = useState('')
 
+  const submitIsDisabled = name.length === 0
+
   const handlAdd = () => {
-    if (name.length > 0) {
+    if (submitIsDisabled) {
       createNewDomain(name)
       setName('')
       setOpen(false)
@@ -76,7 +78,9 @@ export const OwnNameDialog = ({ createNewDomain }: Props) => {
           <p className="text-sm text-red-700">{error}</p>
         </form>
         <DialogFooter>
-          <Button onClick={handlAdd}>Add to List</Button>
+          <Button onClick={handlAdd} disabled={submitIsDisabled}>
+            Add to List
+          </Button>
         </DialogFooter>
       </DialogContent>
     </Dialog>

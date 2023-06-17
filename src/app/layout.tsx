@@ -1,3 +1,4 @@
+import Footer from '@/components/Footer'
 import { NavBar } from '@/components/NavBar'
 import { Toaster } from '@/components/ui/Toaster'
 import { Analytics } from '@vercel/analytics/react'
@@ -27,6 +28,7 @@ export default function RootLayout({
             <div className="w-full aspect-square dark:bg-blue-950 rounded-full blur-3xl opacity-10 scale-125" />
           </div>
           {children}
+          <Footer />
         </main>
         <Toaster />
         <Analytics />
