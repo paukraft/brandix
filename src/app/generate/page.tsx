@@ -258,7 +258,7 @@ export default function Home() {
 
   return (
     <>
-      <div className="flex flex-col md:mt-4 lg:mt-8 xl:mt-20 max-w-2xl mx-auto w-full gap-3 px-4">
+      <div className="flex flex-col md:mt-4 lg:mt-8 xl:mt-12 max-w-2xl mx-auto w-full gap-3 px-4">
         <div
           className={cn(
             'flex invisible justify-between gap-2',

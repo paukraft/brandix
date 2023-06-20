@@ -6,9 +6,9 @@ import Link from 'next/link'
 
 export default function Home() {
   return (
-    <div className="flex flex-col gap-28">
+    <div className="flex flex-col gap-24">
       {/* Hero */}
-      <div className="px-4 container mx-auto flex items-center flex-col mt-20 gap-6">
+      <div className="px-4 container mx-auto flex items-center flex-col mt-16 gap-6">
         <Link href="/generate">
           <Button variant="outline" className="rounded-full group/generate">
             Use for free
@@ -76,7 +76,7 @@ export default function Home() {
             </dd>
           </div>
           <div className="mx-auto flex max-w-xs flex-col gap-y-4">
-            <dt className="text-base leading-7 text-gray-400">Users</dt>
+            <dt className="text-base leading-7 text-gray-400">Total Users</dt>
             <dd className="order-first text-3xl font-semibold tracking-tight sm:text-5xl">
               0
             </dd>

@@ -2,7 +2,7 @@ import Link from 'next/link'
 
 export default function Footer() {
   return (
-    <footer className="w-full">
+    <footer className="w-full flex-1 flex flex-col justify-end">
       <div className="container mx-auto flex items-center justify-between py-2">
         <Link
           href="https://twitter.com/paukraft"
