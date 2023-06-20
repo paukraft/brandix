@@ -1,6 +1,6 @@
 import { cn } from '@/lib/utils'
 import { TextCursorInput } from 'lucide-react'
-import { useState } from 'react'
+import { useCallback, useMemo, useState } from 'react'
 import { Button } from './ui/button'
 import {
   Dialog,
@@ -22,18 +22,18 @@ export const OwnNameDialog = ({ createNewDomain }: Props) => {
   const [open, setOpen] = useState(false)
   const [error, setError] = useState('')
 
-  const submitIsDisabled = name.length === 0
+  const submitIsDisabled = useMemo(() => name.length === 0, [name])
 
-  const handlAdd = () => {
-    if (submitIsDisabled) {
-      createNewDomain(name)
-      setName('')
-      setOpen(false)
-      setError('')
-    } else {
-      setError('At least one character is required')
+  const handlAdd = useCallback(() => {
+    if (name.length === 0) {
+      setError('Name cannot be empty')
+      return
     }
-  }
+    createNewDomain(name)
+    setName('')
+    setError('')
+    setOpen(false)
+  }, [name, createNewDomain])
 
   return (
     <Dialog
