@@ -71,6 +71,7 @@ export type Domain = {
   cantFigureOutAvailability?: boolean
   createdAt: Date
   whois?: string
+  errorWhileChecking?: boolean
 }
 
 export default function Home() {
@@ -192,7 +193,11 @@ export default function Home() {
     ).map((item) => item.replace(/^\d+\.\s/, ''))
 
     // Debugging
-    if (!streamResponse.messageIsStreaming) {
+    if (
+      !streamResponse.messageIsStreaming &&
+      isClient &&
+      window.location.hostname !== 'localhost'
+    ) {
       console.log(streamResponse.responseString)
     }
 
@@ -215,6 +220,20 @@ export default function Home() {
     })
 
     if (!response.ok) {
+      setDomains((prev) => {
+        const newDomains = [...prev]
+
+        const i = newDomains.findIndex((item) => item.domain === domain)
+
+        newDomains[i] = {
+          ...newDomains[i],
+          errorWhileChecking: true,
+          checking: false,
+        }
+
+        return newDomains
+      })
+
       toast({
         title: 'Error',
         description: response.statusText,

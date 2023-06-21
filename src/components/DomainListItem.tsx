@@ -101,7 +101,12 @@ export const DomainListItem = ({
             target="_blank"
             rel="noreferrer"
           >
-            {domain.cantFigureOutAvailability ? (
+            {domain.errorWhileChecking ? (
+              <div className="flex items-center gap-2 text-red-700 hover:underline">
+                <div className="w-1.5 h-1.5 rounded-full bg-red-700" />
+                <div className="text-xs">Error while checking</div>
+              </div>
+            ) : domain.cantFigureOutAvailability ? (
               <div className="flex items-center gap-2 text-gray-400 hover:underline">
                 <div className="w-1.5 h-1.5 rounded-full bg-gray-400" />
                 <div className="text-xs">Unknown probably for Sale</div>
