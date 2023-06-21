@@ -1,4 +1,5 @@
-import AppScreenshot from '@/assets/app-screenshot.png'
+import AppScreenshotDesktop from '@/assets/app-screenshot-desktop.png'
+import AppScreenshotMobile from '@/assets/app-screenshot-mobile.png'
 import { Button } from '@/components/ui/button'
 import { ArrowRight } from 'lucide-react'
 import Image from 'next/image'
@@ -6,9 +7,9 @@ import Link from 'next/link'
 
 export default function Home() {
   return (
-    <div className="flex flex-col gap-24">
+    <div className="flex flex-col gap-0 md:gap-16 xl:gap-24">
       {/* Hero */}
-      <div className="px-4 container mx-auto flex items-center flex-col mt-16 gap-6">
+      <div className="px-4 container mx-auto flex items-center flex-col md:mt-12 xl:mt-16 gap-6">
         <Link href="/generate">
           <Button variant="outline" className="rounded-full group/generate">
             Use for free
@@ -36,11 +37,18 @@ export default function Home() {
           <div className="mt-12 flow-root sm:mt-20">
             <div className="-m-2 rounded-xl dark:bg-gray-100/5 bg-gray-900/5 p-2 ring-1 ring-inset dark:ring-gray-100/10 ring-gray-900/10 lg:-m-4 lg:rounded-2xl lg:p-4">
               <Image
-                src={AppScreenshot}
+                src={AppScreenshotDesktop}
                 alt="App screenshot"
                 width="2811"
                 height="4944"
-                className="rounded-md shadow-2xl ring-1 dark:ring-gray-100/10 ring-gray-900/10"
+                className="rounded-md shadow-2xl ring-1 dark:ring-gray-100/10 ring-gray-900/10 max-md:hidden"
+              />
+              <Image
+                src={AppScreenshotMobile}
+                alt="App screenshot"
+                width="1170"
+                height="2532"
+                className="rounded-md shadow-2xl ring-1 dark:ring-gray-100/10 ring-gray-900/10 md:hidden"
               />
             </div>
           </div>
@@ -57,7 +65,7 @@ export default function Home() {
         </span>
       </div> */}
 
-      <div className="mx-auto max-w-7xl px-6 lg:px-8 mt-36">
+      <div className="mx-auto max-w-7xl px-6 lg:px-8 mt-20 md:mt-20 xl:mt-36">
         <dl className="grid grid-cols-1 gap-x-8 gap-y-16 text-center lg:grid-cols-3">
           <div className="mx-auto flex max-w-xs flex-col gap-y-4">
             <dt className="text-base leading-7 text-gray-400">
