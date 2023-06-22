@@ -110,6 +110,8 @@ export default function Home() {
 
   const { send: sendStream, streamResponse } = useStream()
 
+  const sendIsDisabled = streamResponse.messageIsStreaming || myMessage === ''
+
   const scrollToBottom = () => {
     if (scrollAreaRef.current) {
       const scrollArea = scrollAreaRef.current
@@ -467,7 +469,7 @@ export default function Home() {
           className="border border-input rounded-lg flex items-center w-full px-4"
           onSubmit={(e) => {
             e.preventDefault()
-            if (streamResponse.messageIsStreaming) return
+            if (sendIsDisabled) return
             send(
               `${myMessage} give me 5 brandname suggestions in a list, only brandnames no description or tagline`
             )
@@ -495,7 +497,7 @@ export default function Home() {
               size="sm"
               className="whitespace-nowrap dark:text-gray-300"
               type="submit"
-              disabled={streamResponse.messageIsStreaming}
+              disabled={sendIsDisabled}
             >
               {streamResponse.messageIsStreaming ? (
                 <Spinner className="w-5 h-5" />
@@ -511,7 +513,7 @@ export default function Home() {
             <Button
               variant="outline"
               className="py-6 rounded-lg"
-              // disabled={streamResponse.messageIsStreaming}
+              disabled={streamResponse.messageIsStreaming}
               onClick={() => {
                 if (streamResponse.messageIsStreaming) return
                 newSystemMessage('Generate more')

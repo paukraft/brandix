@@ -3,7 +3,7 @@ import Link from 'next/link'
 export default function Footer() {
   return (
     <footer className="w-full flex-1 flex flex-col justify-end">
-      <div className="container mx-auto flex items-center justify-between py-2">
+      <div className="container mx-auto flex items-center justify-between py-3">
         <Link
           href="https://twitter.com/paukraft"
           className="text-xs text-gray-500 hover:underline"
