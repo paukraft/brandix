@@ -33,7 +33,7 @@ export const metadata = {
     siteName: 'Brandix',
     images: [
       {
-        url: 'https://brandix.com/logo.png',
+        url: 'https://brandix.ai/logo.png',
         width: 1080,
         height: 1080,
         alt: 'Brandix - AI Name Generator',
