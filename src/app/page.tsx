@@ -66,27 +66,19 @@ export default function Home() {
       </div> */}
 
       <div className="mx-auto max-w-7xl px-6 lg:px-8 mt-20 md:mt-20 xl:mt-36">
-        <dl className="grid grid-cols-1 gap-x-8 gap-y-16 text-center lg:grid-cols-3">
+        <dl className="grid grid-cols-1 gap-x-8 gap-y-16 text-center lg:grid-cols-2">
           <div className="mx-auto flex max-w-xs flex-col gap-y-4">
             <dt className="text-base leading-7 text-gray-400">
               Generations every 24 hours
             </dt>
             <dd className="order-first text-3xl font-semibold tracking-tight sm:text-5xl">
-              0 million
-            </dd>
-          </div>
-          <div className="mx-auto flex max-w-xs flex-col gap-y-4">
-            <dt className="text-base leading-7 text-gray-400">
-              Favorites saved
-            </dt>
-            <dd className="order-first text-3xl font-semibold tracking-tight sm:text-5xl">
-              0 thousand
+              1.5 thousand
             </dd>
           </div>
           <div className="mx-auto flex max-w-xs flex-col gap-y-4">
             <dt className="text-base leading-7 text-gray-400">Total Users</dt>
             <dd className="order-first text-3xl font-semibold tracking-tight sm:text-5xl">
-              0
+              120+
             </dd>
           </div>
         </dl>
