@@ -8,8 +8,40 @@ import './globals.css'
 const inter = Inter({ subsets: ['latin'] })
 
 export const metadata = {
-  title: 'Brandix',
-  description: 'Generated brand names with AI',
+  title: 'Brandix - Generate Brand Names Using AI',
+  description:
+    'Brandix uses AI to generate unique, short, and brandable business names. Our algorithm learns to make better recommendations over time. Try it for free!',
+  keywords: [
+    'Brandix',
+    'AI',
+    'brand names',
+    'business names',
+    'unique names',
+    'short names',
+    'brandable names',
+    'name generator',
+    'algorithm',
+    'recommendations',
+  ],
+  authors: [{ name: 'Pau Kraft' }],
+  publisher: 'Brandix',
+  openGraph: {
+    title: 'Brandix - Generate Brand Names Using AI',
+    description:
+      'Brandix uses AI to generate unique, short, and brandable business names. Our algorithm learns to make better recommendations over time. Try it for free!',
+    url: 'https://brandix.ai',
+    siteName: 'Brandix',
+    images: [
+      {
+        url: 'https://brandix.com/logo.png',
+        width: 1080,
+        height: 1080,
+        alt: 'Brandix - AI Name Generator',
+      },
+    ],
+    locale: 'en_US',
+    type: 'website',
+  },
 }
 
 export default function RootLayout({
