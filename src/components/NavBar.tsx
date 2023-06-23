@@ -1,6 +1,8 @@
 import Image from 'next/image'
 import Link from 'next/link'
-import Logo from '../assets/logo.svg'
+import LogoBlack from '../assets/logo-black.svg'
+import LogoWhite from '../assets/logo-white.svg'
+import { ModeToggle } from './ModeToggle'
 import { Button } from './ui/button'
 
 export const NavBar = () => {
@@ -11,16 +13,25 @@ export const NavBar = () => {
         <Link href="/">
           <div className="flex items-end">
             <div className="relative h-9 aspect-square">
-              <Image fill src={Logo} alt="Logo" />
+              <Image
+                fill
+                src={LogoWhite}
+                alt="Logo"
+                className="hidden dark:block"
+              />
+              <Image fill src={LogoBlack} alt="Logo" className="dark:hidden" />
             </div>
             <div className="text-3xl leading-none -translate-x-1">randix</div>
           </div>
         </Link>
 
         {/* CTA */}
-        <Link href="/generate">
-          <Button variant="outline">Start generating</Button>
-        </Link>
+        <div className="flex gap-2 items-center">
+          <ModeToggle />
+          <Link href="/generate">
+            <Button variant="outline">Start generating</Button>
+          </Link>
+        </div>
       </div>
     </header>
   )
