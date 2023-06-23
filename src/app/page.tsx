@@ -69,16 +69,16 @@ export default function Home() {
         <dl className="grid grid-cols-1 gap-x-8 gap-y-16 text-center lg:grid-cols-2">
           <div className="mx-auto flex max-w-xs flex-col gap-y-4">
             <dt className="text-base leading-7 text-gray-400">
-              Generations every 24 hours
+              Generated Names
             </dt>
             <dd className="order-first text-3xl font-semibold tracking-tight sm:text-5xl">
-              1.5 thousand
+              10.000+
             </dd>
           </div>
           <div className="mx-auto flex max-w-xs flex-col gap-y-4">
             <dt className="text-base leading-7 text-gray-400">Total Users</dt>
             <dd className="order-first text-3xl font-semibold tracking-tight sm:text-5xl">
-              120+
+              450+
             </dd>
           </div>
         </dl>
