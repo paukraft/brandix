@@ -99,7 +99,7 @@ export default function Home() {
           <div className="mx-auto flex max-w-xs flex-col gap-y-4">
             <dt className="text-base leading-7 text-gray-400">Total Users</dt>
             <dd className="order-first text-3xl font-semibold tracking-tight sm:text-5xl">
-              650+
+              600+
             </dd>
           </div>
         </dl>
