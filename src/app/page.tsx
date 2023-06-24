@@ -1,5 +1,8 @@
-import AppScreenshotDesktop from '@/assets/app-screenshot-desktop.png'
-import AppScreenshotMobile from '@/assets/app-screenshot-mobile.png'
+import AppScreenshotDesktopDark from '@/assets/app-screenshot-desktop-dark.png'
+import AppScreenshotDesktopLight from '@/assets/app-screenshot-desktop-light.png'
+import AppScreenshotMobileDark from '@/assets/app-screenshot-mobile-dark.png'
+import AppScreenshotMobileLight from '@/assets/app-screenshot-mobile-light.png'
+
 import { Button } from '@/components/ui/button'
 import { ArrowRight } from 'lucide-react'
 import Image from 'next/image'
@@ -37,18 +40,36 @@ export default function Home() {
           <div className="mt-12 flow-root sm:mt-20">
             <div className="-m-2 rounded-xl dark:bg-gray-100/5 bg-gray-900/5 p-2 ring-1 ring-inset dark:ring-gray-100/10 ring-gray-900/10 lg:-m-4 lg:rounded-2xl lg:p-4">
               <Image
-                src={AppScreenshotDesktop}
+                src={AppScreenshotDesktopDark}
                 alt="App screenshot"
+                // screenshot dimensions: 1648 x 937
                 width="2811"
                 height="4944"
-                className="rounded-md shadow-2xl ring-1 dark:ring-gray-100/10 ring-gray-900/10 max-md:hidden"
+                className="hidden md:dark:block rounded-md shadow-2xl ring-1 dark:ring-gray-100/10 ring-gray-900/10 max-md:hidden"
               />
               <Image
-                src={AppScreenshotMobile}
+                src={AppScreenshotMobileDark}
                 alt="App screenshot"
+                // screenshot dimensions: 390 x 844
                 width="1170"
                 height="2532"
-                className="rounded-md shadow-2xl ring-1 dark:ring-gray-100/10 ring-gray-900/10 md:hidden"
+                className="hidden max-md:dark:block rounded-md shadow-2xl ring-1 dark:ring-gray-100/10 ring-gray-900/10 md:hidden"
+              />
+              <Image
+                src={AppScreenshotDesktopLight}
+                alt="App screenshot"
+                // screenshot dimensions: 1648 x 937
+                width="2811"
+                height="4944"
+                className="dark:hidden rounded-md shadow-2xl ring-1 dark:ring-gray-100/10 ring-gray-900/10 max-md:hidden"
+              />
+              <Image
+                src={AppScreenshotMobileLight}
+                alt="App screenshot"
+                // screenshot dimensions: 390 x 844
+                width="1170"
+                height="2532"
+                className="dark:hidden rounded-md shadow-2xl ring-1 dark:ring-gray-100/10 ring-gray-900/10 md:hidden"
               />
             </div>
           </div>
