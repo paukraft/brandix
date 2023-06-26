@@ -93,13 +93,13 @@ export default function Home() {
               Generated Names
             </dt>
             <dd className="order-first text-3xl font-semibold tracking-tight sm:text-5xl">
-              20.000+
+              25.000+
             </dd>
           </div>
           <div className="mx-auto flex max-w-xs flex-col gap-y-4">
             <dt className="text-base leading-7 text-gray-400">Total Users</dt>
             <dd className="order-first text-3xl font-semibold tracking-tight sm:text-5xl">
-              850+
+              1.200+
             </dd>
           </div>
         </dl>
