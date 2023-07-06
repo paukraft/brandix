@@ -209,22 +209,19 @@ const FeatureBox = ({
   idx: number
 }) => {
   return (
-    <div className="flex flex-col gap-2">
-      {/* <div className="text-3xl font-bold px-1">{idx}.</div> */}
-      <div
-        className={cn(
-          'rounded-xl border dark:border-gray-100/30 border-gray-900/30 p-5 md:p-7 flex gap-4 justify-between bg-gradient-to-b from-white to-white dark:from-slate-950 dark:to-slate-950 dark:hover:to-slate-900 hover:to-slate-50 duration-100'
-        )}
-      >
-        <div className="flex flex-col">
-          <p className="text-2xl font-semibold">{title}</p>
-          <p className="mt-1 text-sm text-gray-500 dark:text-gray-400">
-            {description}
-          </p>
-        </div>
-        <div className="relative bg-primary text-primary-foreground p-2 rounded-xl h-fit">
-          {icon}
-        </div>
+    <div
+      className={cn(
+        'rounded-xl border dark:border-gray-100/30 border-gray-900/30 p-5 md:p-7 flex gap-4 justify-between bg-gradient-to-b from-white to-white dark:from-slate-950 dark:to-slate-950 dark:hover:to-slate-900 hover:to-slate-50 duration-100'
+      )}
+    >
+      <div className="flex flex-col">
+        <p className="text-2xl font-semibold">{title}</p>
+        <p className="mt-1 text-sm text-gray-500 dark:text-gray-400">
+          {description}
+        </p>
+      </div>
+      <div className="relative bg-primary text-primary-foreground p-2 rounded-xl h-fit">
+        {icon}
       </div>
     </div>
   )
