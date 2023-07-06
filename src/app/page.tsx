@@ -155,7 +155,7 @@ export default function Home() {
                   Generated Names
                 </dt>
                 <dd className="order-first text-3xl font-semibold tracking-tight sm:text-5xl">
-                  38.000+
+                  40.000+
                 </dd>
               </div>
               <div className="mx-auto flex max-w-xs flex-col gap-y-4">
@@ -163,7 +163,7 @@ export default function Home() {
                   Total Users
                 </dt>
                 <dd className="order-first text-3xl font-semibold tracking-tight sm:text-5xl">
-                  1.800+
+                  1.900+
                 </dd>
               </div>
             </dl>
@@ -211,7 +211,7 @@ const FeatureBox = ({
   return (
     <div
       className={cn(
-        'rounded-xl border dark:border-gray-100/30 border-gray-900/30 p-5 md:p-7 flex gap-4 justify-between bg-gradient-to-b from-white to-white dark:from-slate-950 dark:to-slate-950 dark:hover:to-slate-900 hover:to-slate-50 duration-100'
+        'rounded-xl border dark:border-gray-100/30 border-gray-900/30 p-5 lg:p-7 flex gap-4 justify-between bg-gradient-to-b from-white to-white dark:from-slate-950 dark:to-slate-950 dark:hover:to-slate-900 hover:to-slate-50 duration-100'
       )}
     >
       <div className="flex flex-col">
