@@ -59,7 +59,7 @@ export default function Home() {
         </Link>
       </div> */}
 
-      <div className="relative isolate -mb-80 sm:-mb-96 md:-mb-56 -z-10">
+      <div className="relative isolate -mb-80 sm:-mb-96 md:-mb-56 -z-10 overflow-hidden">
         <div className="mx-auto max-w-7xl px-6 lg:px-8">
           <div className="mt-10 flow-root sm:mt-12">
             <div className="-m-2 rounded-xl dark:bg-gray-100/5 bg-gray-900/5 p-2 ring-1 ring-inset dark:ring-gray-100/5 ring-gray-900/5 lg:-m-4 lg:rounded-2xl lg:p-3">
