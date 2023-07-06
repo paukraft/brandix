@@ -23,7 +23,7 @@ export const MessageBubble = ({ message, className }: Props) => {
             You
           </div>
           <div
-            className="text-xs font-light text-gray-400"
+            className="text-xs font-light text-gray-500 dark:text-gray-400"
             title={dateToString(message.createdAt)}
           >
             <TimeAgo date={message.createdAt} />
