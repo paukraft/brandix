@@ -34,8 +34,12 @@ export const NavBar = () => {
 
           {/* CTA */}
           <div className="flex items-center">
-            <Button variant="ghost" size="icon">
-              <Link href="https://twitter.com/paukraft" target={'_blank'}>
+            <Button variant="ghost" size="icon" name="My personal twitter">
+              <Link
+                href="https://twitter.com/paukraft"
+                target={'_blank'}
+                aria-label="My personal twitter"
+              >
                 <Icons.twitter className="h-4 w-4" />
               </Link>
             </Button>
