@@ -4,6 +4,7 @@ import LogoBlack from '../assets/logo-black.svg'
 import LogoWhite from '../assets/logo-white.svg'
 import { ModeToggle } from './ModeToggle'
 import { Button } from './ui/button'
+import { Icons } from './ui/icons'
 
 export const NavBar = () => {
   return (
@@ -32,10 +33,17 @@ export const NavBar = () => {
           </Link>
 
           {/* CTA */}
-          <div className="flex gap-2 items-center">
+          <div className="flex items-center">
+            <Button variant="ghost" size="icon">
+              <Link href="https://twitter.com/paukraft" target={'_blank'}>
+                <Icons.twitter className="h-4 w-4" />
+              </Link>
+            </Button>
             <ModeToggle />
-            <Link href="/generate">
-              <Button variant="outline">Start generating</Button>
+            <Link href="/generate" className="ml-1">
+              <Button variant="outline" className="rounded-full flex gap-1">
+                Start <span className="hidden sm:block">generating</span>
+              </Button>
             </Link>
           </div>
         </div>

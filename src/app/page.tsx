@@ -2,6 +2,12 @@ import AppScreenshotDesktopDark from '@/assets/app-screenshot-desktop-dark.png'
 import AppScreenshotDesktopLight from '@/assets/app-screenshot-desktop-light.png'
 import AppScreenshotMobileDark from '@/assets/app-screenshot-mobile-dark.png'
 import AppScreenshotMobileLight from '@/assets/app-screenshot-mobile-light.png'
+import {
+  Accordion,
+  AccordionContent,
+  AccordionItem,
+  AccordionTrigger,
+} from '@/components/ui/accordion'
 
 import { Button } from '@/components/ui/button'
 import { cn } from '@/lib/utils'
@@ -9,6 +15,43 @@ import { SparklesIcon } from '@heroicons/react/24/solid'
 import { BrainCog, Check, Star } from 'lucide-react'
 import Image from 'next/image'
 import Link from 'next/link'
+
+const FAQ: {
+  question: string
+  answer: string
+  value: string
+}[] = [
+  {
+    question: 'How does the AI brand name generator work?',
+    answer: `Our AI brand name generator creates a list of unique brand names based on your input. You can pick from different categories or type in a brief description, and our AI will do the rest. If you like a name but want to see more like it, just hit the 'Generate Variations' button.`,
+    value: 'how-does-it-work',
+  },
+  {
+    question: 'Do I have to pay to use the brand name generator?',
+    answer: `No, our brand name generator is completely free. You can generate as many names as you want without any charges. It's a handy tool for coming up with business names, product names, brand names, company names, project names, usernames, profilenames, domain names and more.`,
+    value: 'how-much-does-it-cost',
+  },
+  {
+    question: 'What types of names can I generate?',
+    answer: `You can generate a wide variety of names using our tool. This includes business names, product names, brand names, company names, project names, usernames, profilenames, and even domain names. It's a versatile tool that can help you come up with the perfect name for almost anything.`,
+    value: 'what-names-can-i-generate',
+  },
+  {
+    question: 'How do I pick a good brand name?',
+    answer: `A good brand name is short, easy to remember, and unique. You can use our brand name generator to come up with a list of names and then pick the one you like the most. If you have a name in mind, you can use our generator to create different versions of it.`,
+    value: 'how-to-choose-a-good-brand-name',
+  },
+  {
+    question: 'How does the domain availability check work?',
+    answer: `Our brand name generator also checks if the generated brand names are available as domain names. This helps you make sure your chosen brand name can also be your website's domain name, keeping your brand consistent across different platforms.`,
+    value: 'domain-availability-check',
+  },
+  {
+    question: 'Can I save my favorite brand names for later?',
+    answer: `Yes, you can save your favorite brand names. This lets you create a shortlist of names you like, which you can come back to and review whenever you want.`,
+    value: 'save-favorite-brand-names',
+  },
+]
 
 export default function Home() {
   return (
@@ -169,6 +212,24 @@ export default function Home() {
             </dl>
           </div>
         </div>
+      </div>
+
+      <div className="container mx-auto w-full flex flex-col mt-36 md:mt-44 lg:mt-72 gap-8 md:gap-14">
+        <div className="font-semibold text-5xl md:text-7xl">
+          Frequently asked questions
+        </div>
+        <Accordion type="single" collapsible className="w-full">
+          {FAQ.map((faq) => (
+            <AccordionItem value={faq.question} key={faq.value}>
+              <AccordionTrigger className="md:text-2xl md:pt-6 md:pb-4">
+                {faq.question}
+              </AccordionTrigger>
+              <AccordionContent className="md:text-lg md:pb-2 opacity-90">
+                {faq.answer}
+              </AccordionContent>
+            </AccordionItem>
+          ))}
+        </Accordion>
       </div>
 
       <div className="mb-10 md:mb-16" />
