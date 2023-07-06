@@ -15,7 +15,9 @@ export const BrandExample = ({ brandExample, onClick }: Props) => {
       onClick={onClick}
     >
       <h3 className="font-mediuma">{brandExample.title}</h3>
-      <p className="text-sm text-gray-400">{brandExample.description}</p>
+      <p className="text-sm text-gray-500 dark:text-gray-400">
+        {brandExample.description}
+      </p>
     </button>
   )
 }
