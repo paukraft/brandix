@@ -4,12 +4,12 @@ import {
   type ReconnectInterval,
 } from 'eventsource-parser'
 
-type Message = {
+export type Message = {
   role: 'user' | 'system' | 'assistant' | string
   content: string
 }
 
-type OpenAIModel = 'gpt-4' | 'gpt-3.5-turbo' | 'gpt-3.5-turbo-0613'
+export type OpenAIModel = 'gpt-4' | 'gpt-3.5-turbo' | 'gpt-3.5-turbo-0613'
 
 export const openAIStream = async ({
   model,

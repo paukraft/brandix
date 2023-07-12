@@ -15,7 +15,7 @@ export async function POST(req: NextRequest) {
   const body = await req.json()
   const { domain } = inputSchema.parse(body)
 
-  const { success } = await rateLimiter(req)
+  const { success } = await rateLimiter({ req })
 
   if (!success) {
     return new Response('Rate limit exceeded', { status: 429 })

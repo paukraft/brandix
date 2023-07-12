@@ -1,7 +1,7 @@
 import { Domain } from '@/app/generate/page'
 import { cn } from '@/lib/utils'
-import { Star, Wand2 } from 'lucide-react'
-import { Dispatch, SetStateAction } from 'react'
+import { Share2, Star, Wand2 } from 'lucide-react'
+import { Dispatch, SetStateAction, useState } from 'react'
 import { CopyButton } from './ui/CopyButton'
 import { SimpleTooltip } from './ui/SimpleTooltip'
 import { useToast } from './ui/use-toast'
@@ -11,6 +11,7 @@ type Props = {
   isLast?: boolean
   newSystemMessage: (message: string) => void
   send: (message: string) => void
+  generateVariants: (name: string) => void
   isFavorite: boolean
   setFavorites: Dispatch<SetStateAction<Domain[]>>
 }
@@ -20,20 +21,22 @@ export const DomainListItem = ({
   isLast,
   newSystemMessage,
   send,
+  generateVariants,
   isFavorite,
   setFavorites,
 }: Props) => {
   const { toast } = useToast()
+  const [shared, setShared] = useState(false)
 
   return (
     <div
       key={domain.name}
       className={cn(
-        'group/item flex items-center justify-between px-4 py-2 rounded-lg border border-input hover:bg-accent/20 overflow-hidden relative dark:bg-zinc-900/10 shrink-0',
+        'group/item flex items-center justify-between px-3 py-2 rounded-lg gap-2 border border-input hover:bg-accent/20 overflow-hidden relative dark:bg-zinc-900/10',
         !isLast && 'mb-3'
       )}
     >
-      <div>
+      <div className="flex flex-col overflow-hidden">
         <div className="flex items-center">
           {domain.name}
           <CopyButton
@@ -44,7 +47,7 @@ export const DomainListItem = ({
 
         <div className="flex items-center">
           <a href={`https://${domain.domain}`} target="_blank" rel="noreferrer">
-            <div className="font-light text-sm">
+            <div className="font-light text-sm line-clamp-1">
               <span className="opacity-60">https://</span>
               {domain.domain}
             </div>
@@ -56,8 +59,29 @@ export const DomainListItem = ({
         </div>
       </div>
 
-      <div className="flex gap-3 md:gap-4">
+      <div className="flex gap-3 md:gap-4 items-center">
         <div className="flex md:hidden group-hover/item:flex text-xs gap-1 md:gap-2 dark:text-gray-400">
+          <SimpleTooltip title="Share with brandix community">
+            <button
+              disabled={shared}
+              onClick={async () => {
+                fetch('api/share-name', {
+                  method: 'POST',
+                  body: JSON.stringify({
+                    name: domain.name,
+                  }),
+                })
+
+                setShared(true)
+                toast({
+                  title: 'Shared with community',
+                })
+              }}
+            >
+              <Share2 fill={shared ? 'currentColor' : 'none'} size={16} />
+            </button>
+          </SimpleTooltip>
+
           <SimpleTooltip
             title={isFavorite ? 'Remove from favorites' : 'Add to favorites'}
           >
@@ -85,10 +109,7 @@ export const DomainListItem = ({
           <SimpleTooltip title="Generate Variations">
             <button
               onClick={() => {
-                newSystemMessage(`Generate variations for ${domain.name}`)
-                send(
-                  `Give me 5 more variations similar to ${domain.name}, only brandnames no description or tagline`
-                )
+                generateVariants(domain.name)
               }}
             >
               <Wand2 size={16} />
@@ -104,19 +125,23 @@ export const DomainListItem = ({
             {domain.errorWhileChecking ? (
               <div className="flex items-center gap-2 text-red-700 hover:underline">
                 <div className="w-1.5 h-1.5 rounded-full bg-red-700" />
-                <div className="text-xs">Error while checking</div>
+                <div className="text-xs max-xs:hidden">
+                  Error while checking
+                </div>
               </div>
             ) : domain.cantFigureOutAvailability ? (
               <div className="flex items-center gap-2 text-gray-500 dark:text-gray-400 hover:underline">
                 <div className="w-1.5 h-1.5 rounded-full bg-gray-500 dark:bg-gray-400" />
-                <div className="text-xs">Unknown probably for Sale</div>
+                <div className="text-xs max-xs:hidden">
+                  Unknown probably for Sale
+                </div>
               </div>
             ) : domain.checking ? (
               <>
                 <div className="flex items-center gap-2 relative animate-pulse">
                   <div className="w-1.5 h-1.5 absolute rounded-full bg-primary animate-ping" />
                   <div className="w-1.5 h-1.5 rounded-full bg-primary" />
-                  <div className="text-xs">Checking...</div>
+                  <div className="text-xs max-xs:hidden">Checking...</div>
                 </div>
               </>
             ) : domain.available ? (
@@ -124,7 +149,7 @@ export const DomainListItem = ({
                 {/* <div className="absolute left-0 w-full h-full bg-green-500 opacity-5 blur-lg" /> */}
                 <div className="flex items-center gap-2 text-green-500">
                   <div className="w-1.5 h-1.5 rounded-full bg-green-500" />
-                  <div className="text-xs">
+                  <div className="text-xs max-xs:hidden">
                     {domain.onlyProbably ? 'Probably Available' : 'Available'}
                   </div>
                 </div>
@@ -132,7 +157,7 @@ export const DomainListItem = ({
             ) : (
               <div className="flex items-center gap-2 text-red-700">
                 <div className="w-1.5 h-1.5 rounded-full bg-red-700" />
-                <div className="text-xs">Not Available</div>
+                <div className="text-xs max-xs:hidden">Not Available</div>
               </div>
             )}
           </a>

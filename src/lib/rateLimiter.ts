@@ -2,14 +2,25 @@ import { Ratelimit } from '@upstash/ratelimit'
 import { Redis } from '@upstash/redis'
 import { NextRequest } from 'next/server'
 
-export const rateLimiter = async (req: NextRequest) => {
+const limiters = {
+  generation: Ratelimit.tokenBucket(4, '20 s', 24),
+  vote: Ratelimit.fixedWindow(10, '20 s'),
+}
+
+export const rateLimiter = async ({
+  req,
+  prefix = 'generation',
+}: {
+  req: NextRequest
+  prefix?: keyof typeof limiters
+}) => {
   const ratelimit = new Ratelimit({
     redis: Redis.fromEnv(),
-    limiter: Ratelimit.tokenBucket(4, '20 s', 24),
+    limiter: limiters[prefix],
     analytics: true,
   })
 
-  const identifier = getClientIp(req) ?? 'unknown'
+  const identifier = `${prefix}-${getClientIp(req) ?? 'unknown'}`
 
   const result = await ratelimit.limit(identifier)
 

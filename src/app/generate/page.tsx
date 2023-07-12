@@ -12,6 +12,8 @@ import { ScrollArea } from '@/components/ui/scroll-area'
 import { Spinner } from '@/components/ui/spinner'
 import { useToast } from '@/components/ui/use-toast'
 import { useStream } from '@/hooks/useStream'
+import { checkUrl } from '@/lib/checkUrl'
+import { getUrlFromName } from '@/lib/getUrlFromName'
 import { cn } from '@/lib/utils'
 import { Disclosure } from '@headlessui/react'
 import {
@@ -23,6 +25,7 @@ import {
   RotateCcw,
   Send,
 } from 'lucide-react'
+import { useSearchParams } from 'next/navigation'
 import { useEffect, useRef, useState } from 'react'
 import { useIsClient, useLocalStorage } from 'usehooks-ts'
 
@@ -79,6 +82,8 @@ export default function Home() {
   const { toast } = useToast()
   const isClient = useIsClient()
 
+  const searchParams = useSearchParams()
+
   const [myMessage, setMyMessage] = useState('')
   const [domains, setDomains] = useState<Domain[]>([])
   const [favorites, setFavorites] = useLocalStorage<Domain[]>(
@@ -125,7 +130,7 @@ export default function Home() {
   }
 
   const send = async (message: string) => {
-    const groupedMessages = toRender.reduce((acc, item, i) => {
+    const groupedMessages = toRender.slice(-50).reduce((acc, item, i) => {
       // @ts-expect-error Der is dumm
       if (item.role === 'user') {
         // @ts-expect-error Der is dumm
@@ -157,18 +162,11 @@ export default function Home() {
     })
   }
 
-  const getUrl = (brandname: string) => {
-    return (
-      brandname
-        .trim()
-        .toLowerCase()
-        .replace(/\s+/g, '-')
-        .replace(/[^a-zA-Z0-9-]+/g, '') + extension
-    )
-  }
-
   const createNewDomain = (brandname: string) => {
-    const url = getUrl(brandname)
+    const url = getUrlFromName({
+      name: brandname,
+      extension,
+    })
     setDomains((prev) => [
       ...prev,
       {
@@ -213,54 +211,29 @@ export default function Home() {
   }, [streamResponse])
 
   const checkDomain = async (domain: string) => {
-    const response = await fetch('/api/check-domain', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({ domain: domain }),
+    const response = await checkUrl({
+      url: domain,
     })
-
-    if (!response.ok) {
-      setDomains((prev) => {
-        const newDomains = [...prev]
-
-        const i = newDomains.findIndex((item) => item.domain === domain)
-
-        newDomains[i] = {
-          ...newDomains[i],
-          errorWhileChecking: true,
-          checking: false,
-        }
-
-        return newDomains
-      })
-
-      toast({
-        title: 'Error',
-        description: response.statusText,
-      })
-      return
-    }
-
-    const data = await response.json()
 
     setDomains((prev) => {
       const newDomains = [...prev]
-
       const i = newDomains.findIndex((item) => item.domain === domain)
 
       newDomains[i] = {
         ...newDomains[i],
-        available: data.available,
+        ...response.domain,
         checking: false,
-        cantFigureOutAvailability: data.available === undefined,
-        whois: data.whois,
-        onlyProbably: data.onlyProbably,
       }
 
       return newDomains
     })
+
+    if (response.domain.errorWhileChecking) {
+      toast({
+        title: 'Error',
+        description: response.response?.statusText || 'Unknown error',
+      })
+    }
   }
 
   const newSystemMessage = (message: string) => {
@@ -272,6 +245,22 @@ export default function Home() {
       },
     ])
   }
+
+  const generateVariants = async (name: string) => {
+    newSystemMessage(`Generate variations for ${name}`)
+    send(
+      `Give me 5 more variations similar to ${name}, only brandnames no description or tagline`
+    )
+  }
+
+  useEffect(() => {
+    const variationsFrom = searchParams.get('from')
+
+    if (variationsFrom) {
+      generateVariants(variationsFrom)
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [searchParams])
 
   useEffect(() => {
     scrollToBottom()
@@ -367,6 +356,7 @@ export default function Home() {
                             isFavorite={true}
                             newSystemMessage={newSystemMessage}
                             send={send}
+                            generateVariants={generateVariants}
                             setFavorites={setFavorites}
                             isLast={i === favorites.length - 1}
                           />
@@ -424,6 +414,7 @@ export default function Home() {
                     domain={domain}
                     newSystemMessage={newSystemMessage}
                     send={send}
+                    generateVariants={generateVariants}
                     isFavorite={isFavorite}
                     setFavorites={setFavorites}
                   />
