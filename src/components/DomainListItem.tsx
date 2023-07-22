@@ -2,7 +2,8 @@ import { Domain } from '@/app/generate/page'
 import { cn } from '@/lib/utils'
 import { Share2, Star, Wand2 } from 'lucide-react'
 import Link from 'next/link'
-import { Dispatch, SetStateAction, useState } from 'react'
+import { Dispatch, SetStateAction, useEffect, useState } from 'react'
+import { useLocalStorage } from 'usehooks-ts'
 import { CopyButton } from './ui/CopyButton'
 import { SimpleTooltip } from './ui/SimpleTooltip'
 import { useToast } from './ui/use-toast'
@@ -28,6 +29,16 @@ export const DomainListItem = ({
 }: Props) => {
   const { toast } = useToast()
   const [shared, setShared] = useState(false)
+  const [upvotedNames, setUpvotedNames] = useLocalStorage<string[]>(
+    'upvotedNames',
+    []
+  )
+
+  useEffect(() => {
+    if (upvotedNames.includes(domain.name)) {
+      setShared(true)
+    }
+  }, [domain.name, upvotedNames])
 
   return (
     <div
@@ -79,6 +90,7 @@ export const DomainListItem = ({
                     }),
                   })
 
+                  setUpvotedNames([...upvotedNames, domain.name])
                   setShared(true)
                   toast({
                     title: 'Shared with community',

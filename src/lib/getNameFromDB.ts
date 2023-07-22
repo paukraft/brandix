@@ -193,8 +193,6 @@ export const getNameFromDB = async ({
         JSON.parse(newSimilarNamesREQ.message?.function_call?.arguments || '{}')
       )
 
-      console.log(newSimilarNames.similarNames.length)
-
       await prisma.name.update({
         where: {
           name: name,

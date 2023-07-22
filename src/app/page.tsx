@@ -90,7 +90,7 @@ export default function Home() {
 
         <Link href="/shared-names">
           <Button size="lg" variant="outline">
-            Brandix community
+            Community Names
           </Button>
         </Link>
       </div>

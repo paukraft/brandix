@@ -35,7 +35,7 @@ export const NavBar = () => {
           {/* CTA */}
           <div className="flex items-center">
             <Link href="/shared-names">
-              <Button variant="link">Brandix community</Button>
+              <Button variant="link">Community Names</Button>
             </Link>
             <Button variant="ghost" size="icon" name="My personal twitter">
               <Link
