@@ -31,3 +31,12 @@ export const getNameClient = async (name: string) => {
 
   return nameFromDB
 }
+
+export const shareNameClient = async ({ name }: { name: string }) => {
+  await fetch('api/share-name', {
+    method: 'POST',
+    body: JSON.stringify({
+      name: name,
+    }),
+  })
+}

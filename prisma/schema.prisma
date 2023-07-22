@@ -21,19 +21,19 @@ model Name {
   votes Int @default(0)
 
   uniqueness               Int    @default(0)
-  uniquenessDescription    String @default("")
+  uniquenessDescription    String @default("") @db.MediumText
   memorability             Int    @default(0)
-  memorabilityDescription  String @default("")
+  memorabilityDescription  String @default("") @db.MediumText
   pronunciation            Int    @default(0)
-  pronunciationDescription String @default("")
+  pronunciationDescription String @default("") @db.MediumText
   spelling                 Int    @default(0)
-  spellingDescription      String @default("")
+  spellingDescription      String @default("") @db.MediumText
   positivity               Int    @default(0)
-  positivityDescription    String @default("")
+  positivityDescription    String @default("") @db.MediumText
   versatility              Int    @default(0)
-  versatilityDescription   String @default("")
+  versatilityDescription   String @default("") @db.MediumText
   globalAppeal             Int    @default(0)
-  globalAppealDescription  String @default("")
+  globalAppealDescription  String @default("") @db.MediumText
 
   // Self relation
   similarNames Name[] @relation("SimilarNames")

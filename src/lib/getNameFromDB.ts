@@ -1,4 +1,4 @@
-import { map, some } from 'lodash'
+import { filter, map, some, uniq } from 'lodash'
 import { z } from 'zod'
 import { askGPT } from './askGPT'
 import { prisma } from './prisma'
@@ -60,11 +60,13 @@ export const getNameFromDB = async ({
       },
     },
   })
-
-  let similarNames = [
-    ...(nameFromDB?.similarNames.map((n) => n.name) || []),
-    ...(nameFromDB?.similarTo.map((n) => n.name) || []),
-  ]
+  let similarNames = filter(
+    uniq([
+      ...(nameFromDB?.similarNames.map((n) => n.name) || []),
+      ...(nameFromDB?.similarTo.map((n) => n.name) || []),
+    ]),
+    (n) => n !== name
+  )
 
   const updates = await Promise.all([
     new Promise(async (resolve) => {
@@ -111,13 +113,13 @@ export const getNameFromDB = async ({
           },
           {
             role: 'user',
-            content: `Please give scores and descriptions to the name "${name}"`,
+            content: `Give scores and descriptions to the name "${name}" to each criteria.`,
           },
         ],
         functions: [
           {
             name: 'sendScores',
-            description: 'Send the scores to this function',
+            description: 'Send the scores and descriptions to this function',
             parameters: transformZodSchemaToOpenAi(scoreSchema),
           },
         ],
@@ -234,10 +236,13 @@ export const getNameFromDB = async ({
       },
     })
 
-    let similarNames = [
-      ...(nameFromDB?.similarNames.map((n) => n.name) || []),
-      ...(nameFromDB?.similarTo.map((n) => n.name) || []),
-    ]
+    let similarNames = filter(
+      uniq([
+        ...(nameFromDB?.similarNames.map((n) => n.name) || []),
+        ...(nameFromDB?.similarTo.map((n) => n.name) || []),
+      ]),
+      (n) => n !== name
+    )
   }
 
   return { ...nameFromDB, similarNames }

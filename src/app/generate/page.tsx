@@ -24,6 +24,7 @@ import {
   ListX,
   RotateCcw,
   Send,
+  TextCursorInput,
 } from 'lucide-react'
 import { useSearchParams } from 'next/navigation'
 import { useEffect, useRef, useState } from 'react'
@@ -280,7 +281,11 @@ export default function Home() {
             setExtension={setExtension}
           />
           <div className={cn('flex gap-2')}>
-            <OwnNameDialog createNewDomain={createNewDomain} />
+            <OwnNameDialog createNewDomain={createNewDomain}>
+              <Button size="sm" variant="outline">
+                <TextCursorInput size={16} />
+              </Button>
+            </OwnNameDialog>
 
             <Button
               variant="outline"

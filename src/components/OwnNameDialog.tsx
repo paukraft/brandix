@@ -1,6 +1,5 @@
 import { cn } from '@/lib/utils'
-import { TextCursorInput } from 'lucide-react'
-import { useCallback, useMemo, useState } from 'react'
+import { PropsWithChildren, useCallback, useMemo, useState } from 'react'
 import { Button } from './ui/button'
 import {
   Dialog,
@@ -15,9 +14,18 @@ import { Input } from './ui/input'
 
 type Props = {
   createNewDomain: (name: string) => void
+  title?: string
+  description?: string
+  applyButtonLabel?: string
 }
 
-export const OwnNameDialog = ({ createNewDomain }: Props) => {
+export const OwnNameDialog = ({
+  createNewDomain,
+  children,
+  title = 'Add a Custom Name',
+  description = 'Is there a name floating in your head? Add it here, and we will check its availability for you.',
+  applyButtonLabel = 'Add to List',
+}: PropsWithChildren<Props>) => {
   const [name, setName] = useState('')
   const [open, setOpen] = useState(false)
   const [error, setError] = useState('')
@@ -46,18 +54,11 @@ export const OwnNameDialog = ({ createNewDomain }: Props) => {
         }
       }}
     >
-      <DialogTrigger asChild>
-        <Button size="sm" variant="outline">
-          <TextCursorInput size={16} />
-        </Button>
-      </DialogTrigger>
+      <DialogTrigger asChild>{children}</DialogTrigger>
       <DialogContent className="sm:max-w-[425px]">
         <DialogHeader>
-          <DialogTitle>Add a Custom Name</DialogTitle>
-          <DialogDescription>
-            Is there a name floating in your head? Add it here, and we will
-            check its availability for you.
-          </DialogDescription>
+          <DialogTitle>{title}</DialogTitle>
+          <DialogDescription>{description}</DialogDescription>
         </DialogHeader>
         <form
           className="grid w-full max-w-sm items-center gap-1 py-1"
@@ -79,7 +80,7 @@ export const OwnNameDialog = ({ createNewDomain }: Props) => {
         </form>
         <DialogFooter>
           <Button onClick={handlAdd} disabled={submitIsDisabled}>
-            Add to List
+            {applyButtonLabel}
           </Button>
         </DialogFooter>
       </DialogContent>

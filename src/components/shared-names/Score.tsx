@@ -53,7 +53,7 @@ export const Score = async ({
             <Progressbar value={score} size="small" />
           </AccordionPrimitive.Trigger>
         </div>
-        <AccordionPrimitive.Content className="rounded-lg bg-slate-100 dark:bg-slate-800 overflow-hidden text-sm transition-all data-[state=closed]:animate-accordion-up data-[state=open]:animate-accordion-down">
+        <AccordionPrimitive.Content className="rounded-lg bg-slate-50 dark:bg-slate-900 overflow-hidden text-sm transition-all data-[state=closed]:animate-accordion-up data-[state=open]:animate-accordion-down">
           <div className="p-3">
             <span>{description}</span>
           </div>

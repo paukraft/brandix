@@ -11,20 +11,39 @@ import {
   SelectValue,
 } from '@/components/ui/select'
 import { Spinner } from '@/components/ui/spinner'
-import { getTopNamesClient } from '@/lib/client/sharedNamesClient'
+import {
+  getTopNamesClient,
+  shareNameClient,
+} from '@/lib/client/sharedNamesClient'
 import { useInfiniteQuery } from '@tanstack/react-query'
 import { map, range } from 'lodash'
-import { ArrowBigUpDash, Wand2 } from 'lucide-react'
+import { ArrowBigUpDash, TextCursorInput, Wand2 } from 'lucide-react'
 import Link from 'next/link'
-import { useRouter } from 'next/navigation'
-import React, { useEffect, useRef, useState } from 'react'
+import { usePathname, useRouter, useSearchParams } from 'next/navigation'
+import React, { useCallback, useEffect, useRef, useState } from 'react'
 import { useLocalStorage } from 'usehooks-ts'
+import { OwnNameDialog } from '../OwnNameDialog'
 import { Skeleton } from '../ui/skeleton'
+import { useToast } from '../ui/use-toast'
 import { UpvoteButton } from './upvote-button'
 
 export const SharedNamesList = () => {
   const loadMoreButtonRef = useRef(null)
   const router = useRouter()
+  const searchParams = useSearchParams()
+  const pathname = usePathname()
+  const { toast } = useToast()
+
+  const createQueryString = useCallback(
+    (name: string, value: string) => {
+      // @ts-ignore
+      const params = new URLSearchParams(searchParams)
+      params.set(name, value)
+
+      return params.toString()
+    },
+    [searchParams]
+  )
 
   const [upvotedNames, setUpvotedNames] = useLocalStorage<string[]>(
     'upvotedNames',
@@ -50,6 +69,15 @@ export const SharedNamesList = () => {
       }),
     getNextPageParam: (lastPage, pages) => lastPage.nextCursor,
   })
+
+  useEffect(() => {
+    if (
+      searchParams.get('timespan') &&
+      ['1', '7', '30', '365', '0'].includes(searchParams.get('timespan') || '')
+    ) {
+      setTimespanInDays(searchParams.get('timespan') || '0')
+    }
+  }, [searchParams])
 
   useEffect(() => {
     refetch()
@@ -78,39 +106,68 @@ export const SharedNamesList = () => {
 
   return (
     <div className="flex flex-col gap-3">
-      <div className="flex items-center gap-3">
-        <div className="flex items-center">
-          <ArrowBigUpDash fill="currentColor" className="" size={26} />
-          <div className="font-bold leading-tight tracking-tighter">Top</div>
+      {/* Header */}
+      <div className="flex justify-between gap-2">
+        <div className="flex items-center gap-3">
+          <div className="flex items-center">
+            <ArrowBigUpDash fill="currentColor" className="" size={26} />
+            <div className="font-bold leading-tight tracking-tighter">Top</div>
+          </div>
+
+          <Select
+            value={timespanInDays?.toString()}
+            onValueChange={(value) => {
+              setTimespanInDays(value)
+              router.push(pathname + '?' + createQueryString('timespan', value))
+            }}
+          >
+            <SelectTrigger className="w-[130px] rounded-full h-8">
+              <SelectValue />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem className="py-1" value="1">
+                Today
+              </SelectItem>
+              <SelectItem className="py-1" value="7">
+                This Week
+              </SelectItem>
+              <SelectItem className="py-1" value="30">
+                This Month
+              </SelectItem>
+              <SelectItem className="py-1" value="365">
+                This Year
+              </SelectItem>
+              <SelectItem className="py-1" value="0">
+                All Time
+              </SelectItem>
+            </SelectContent>
+          </Select>
         </div>
 
-        <Select
-          value={timespanInDays?.toString()}
-          onValueChange={(value) => setTimespanInDays(value)}
-        >
-          <SelectTrigger className="w-[130px] rounded-full h-8">
-            <SelectValue />
-          </SelectTrigger>
-          <SelectContent>
-            <SelectItem className="py-1" value="1">
-              Today
-            </SelectItem>
-            <SelectItem className="py-1" value="7">
-              This Week
-            </SelectItem>
-            <SelectItem className="py-1" value="30">
-              This Month
-            </SelectItem>
-            <SelectItem className="py-1" value="365">
-              This Year
-            </SelectItem>
-            <SelectItem className="py-1" value="0">
-              All Time
-            </SelectItem>
-          </SelectContent>
-        </Select>
+        <div className="flex items-center gap-3">
+          <OwnNameDialog
+            createNewDomain={async (name) => {
+              await shareNameClient({ name })
+
+              setUpvotedNames([...upvotedNames, name])
+              toast({
+                title: 'Shared with community',
+              })
+              refetch()
+            }}
+            title="Share a name"
+            description="Is there a name floating in your head? Add it here, and we will share and analyze it for you."
+            applyButtonLabel="Share name"
+          >
+            <Button variant="outline" size="sm" className="h-8 gap-2">
+              <TextCursorInput size={16} />
+              <span className="hidden xs:block">Share name</span>
+            </Button>
+          </OwnNameDialog>
+        </div>
       </div>
 
+      {/* List */}
       <div className="flex flex-col gap-3">
         {isLoading &&
           map(range(4), (i) => (

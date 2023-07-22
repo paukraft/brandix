@@ -1,4 +1,5 @@
 import { Domain } from '@/app/generate/page'
+import { shareNameClient } from '@/lib/client/sharedNamesClient'
 import { cn } from '@/lib/utils'
 import { Share2, Star, Wand2 } from 'lucide-react'
 import Link from 'next/link'
@@ -83,12 +84,7 @@ export const DomainListItem = ({
             <SimpleTooltip title="Share with brandix community">
               <button
                 onClick={async () => {
-                  fetch('api/share-name', {
-                    method: 'POST',
-                    body: JSON.stringify({
-                      name: domain.name,
-                    }),
-                  })
+                  shareNameClient({ name: domain.name })
 
                   setUpvotedNames([...upvotedNames, domain.name])
                   setShared(true)

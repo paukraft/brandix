@@ -108,15 +108,7 @@ export default function Home({ params }: { params: { name: string } }) {
         <span className="text-xl font-bold leading-tight tracking-tighter">
           Similar names:
         </span>
-        <Suspense
-          fallback={
-            <div className="grid grid-cols-5 gap-4">
-              {map(range(1), (i) => (
-                <Skeleton key={i} className="w-full h-[48px]" />
-              ))}
-            </div>
-          }
-        >
+        <Suspense fallback={<Skeleton className="w-full h-[34px]" />}>
           <SimilarNames name={nameParam} />
         </Suspense>
       </div>
