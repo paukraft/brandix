@@ -1,22 +1,33 @@
 import { OpenAIModel } from '@/lib/openAiStream'
-import { ChatCompletionRequestMessage, Configuration, OpenAIApi } from 'openai'
+import {
+  ChatCompletionFunctions,
+  ChatCompletionRequestMessage,
+  Configuration,
+  OpenAIApi,
+} from 'openai'
+import { cache } from 'react'
 
 const configuration = new Configuration({
   apiKey: process.env.OPENAI_API_KEY,
 })
 const openai = new OpenAIApi(configuration)
 
-export const askGPT = async ({
-  model,
-  messages,
-}: {
-  model: OpenAIModel
-  messages: ChatCompletionRequestMessage[]
-}) => {
-  const chatCompletion = await openai.createChatCompletion({
+export const askGPT = cache(
+  async ({
     model,
-    messages: messages,
-  })
+    messages,
+    functions = undefined,
+  }: {
+    model: OpenAIModel
+    messages: ChatCompletionRequestMessage[]
+    functions?: ChatCompletionFunctions[]
+  }) => {
+    const chatCompletion = await openai.createChatCompletion({
+      model,
+      messages: messages,
+      functions,
+    })
 
-  return chatCompletion.data.choices[0]
-}
+    return chatCompletion.data.choices[0]
+  }
+)

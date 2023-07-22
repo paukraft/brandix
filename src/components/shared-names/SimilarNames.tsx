@@ -1,0 +1,30 @@
+import { Card } from '@/app/shared-names/[name]/page'
+import { getNameFromDB } from '@/lib/getNameFromDB'
+import Link from 'next/link'
+import { ScrollArea, ScrollBar } from '../ui/scroll-area'
+
+type Props = {
+  name: string
+}
+
+export const SimilarNames = async ({ name }: Props) => {
+  const nameFromDB = await getNameFromDB({
+    name,
+    generate: ['similar'],
+  })
+  return (
+    <ScrollArea>
+      <div className="flex gap-4">
+        {/* Map over max 5 names */}
+        {nameFromDB?.similarNames?.slice(0, 5).map((name) => (
+          <Link href={`/shared-names/${name}`} key={name}>
+            <Card className="w-full p-0 py-1 px-2">
+              <span>{name}</span>
+            </Card>
+          </Link>
+        ))}
+      </div>
+      <ScrollBar orientation="horizontal" />
+    </ScrollArea>
+  )
+}

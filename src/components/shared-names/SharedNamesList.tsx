@@ -11,26 +11,27 @@ import {
   SelectValue,
 } from '@/components/ui/select'
 import { Spinner } from '@/components/ui/spinner'
-import { useToast } from '@/components/ui/use-toast'
 import { getTopNamesClient } from '@/lib/client/sharedNamesClient'
-import { cn } from '@/lib/utils'
 import { useInfiniteQuery } from '@tanstack/react-query'
-import { ArrowBigUp, ArrowBigUpDash, Wand2 } from 'lucide-react'
+import { map, range } from 'lodash'
+import { ArrowBigUpDash, Wand2 } from 'lucide-react'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 import React, { useEffect, useRef, useState } from 'react'
 import { useLocalStorage } from 'usehooks-ts'
+import { Skeleton } from '../ui/skeleton'
+import { UpvoteButton } from './upvote-button'
 
 export const SharedNamesList = () => {
   const loadMoreButtonRef = useRef(null)
-  const { toast } = useToast()
   const router = useRouter()
 
   const [upvotedNames, setUpvotedNames] = useLocalStorage<string[]>(
     'upvotedNames',
     []
   )
-  const [timespanInDays, setTimespanInDays] = useState<number>(0)
+  const [timespanInDaysString, setTimespanInDays] = useState('0')
+  const timespanInDays = parseInt(timespanInDaysString)
 
   const {
     data,
@@ -39,6 +40,7 @@ export const SharedNamesList = () => {
     isFetching,
     isFetchingNextPage,
     refetch,
+    isLoading,
   } = useInfiniteQuery({
     queryKey: ['topNames'],
     queryFn: ({ pageParam }) =>
@@ -52,30 +54,6 @@ export const SharedNamesList = () => {
   useEffect(() => {
     refetch()
   }, [timespanInDays])
-
-  const upvoteName = async (name: string) => {
-    if (upvotedNames.includes(name)) return
-
-    await fetch('/api/upvote-name', {
-      method: 'POST',
-      body: JSON.stringify({
-        name,
-      }),
-    }).then((res) => {
-      if (res.status === 429) {
-        toast({
-          title: "Howdy cowboy, you're upvoting too fast!",
-          variant: 'destructive',
-        })
-      } else {
-        toast({
-          title: 'Upvoted',
-        })
-        setUpvotedNames([...upvotedNames, name])
-        refetch()
-      }
-    })
-  }
 
   useEffect(() => {
     if (!loadMoreButtonRef.current || !hasNextPage || isFetchingNextPage) {
@@ -108,7 +86,7 @@ export const SharedNamesList = () => {
 
         <Select
           value={timespanInDays?.toString()}
-          onValueChange={(value) => setTimespanInDays(parseInt(value))}
+          onValueChange={(value) => setTimespanInDays(value)}
         >
           <SelectTrigger className="w-[130px] rounded-full h-8">
             <SelectValue />
@@ -134,6 +112,11 @@ export const SharedNamesList = () => {
       </div>
 
       <div className="flex flex-col gap-3">
+        {isLoading &&
+          map(range(4), (i) => (
+            <Skeleton key={i} className="w-full h-[58px]" />
+          ))}
+
         {data?.pages.map((group, i) => (
           <React.Fragment key={i}>
             {group.data.map((name) => {
@@ -141,16 +124,15 @@ export const SharedNamesList = () => {
 
               return (
                 <div
-                  className="group/item flex items-center justify-between px-3 py-2 rounded-lg gap-2 border border-input cursor-pointer hover:bg-accent/20 overflow-hidden relative dark:bg-zinc-900/10"
+                  className="group/item flex items-center justify-between px-3 py-2 rounded-lg gap-2 border border-input hover:bg-accent/20 overflow-hidden relative dark:bg-zinc-900/10"
                   key={name.id}
-                  onClick={() => {
-                    router.push(`/shared-names/${name.name}`)
-                  }}
                 >
                   <div className="flex flex-col">
-                    <div className="group-hover/item:underline decoration-1">
-                      {name.name}
-                    </div>
+                    <Link href={`/shared-names/${name.name}`}>
+                      <div className="hover:underline decoration-1">
+                        {name.name}
+                      </div>
+                    </Link>
                     <span className="text-muted-foreground font-light text-xs">
                       Posted <TimeAgo date={new Date(name.createdAt)} />
                     </span>
@@ -168,27 +150,11 @@ export const SharedNamesList = () => {
                       </Link>
                     </SimpleTooltip>
 
-                    <SimpleTooltip title={isUpvoted ? 'Upvoted' : 'Upvote'}>
-                      <button
-                        className={cn(
-                          'flex items-center',
-                          isUpvoted
-                            ? ''
-                            : 'text-muted-foreground hover:text-black dark:hover:text-white'
-                        )}
-                        onClick={(e) => {
-                          e.stopPropagation()
-                          upvoteName(name.name)
-                        }}
-                        disabled={isUpvoted}
-                      >
-                        <ArrowBigUp
-                          strokeWidth={isUpvoted ? 2 : 1.5}
-                          size={20}
-                        />
-                        {name.votes}
-                      </button>
-                    </SimpleTooltip>
+                    <UpvoteButton
+                      name={name.name}
+                      votes={name.votes}
+                      refetch={refetch}
+                    />
                   </div>
                 </div>
               )
@@ -214,7 +180,7 @@ export const SharedNamesList = () => {
           </div>
         )}
 
-        {!isFetchingNextPage && !hasNextPage && (
+        {!isFetchingNextPage && !isLoading && !hasNextPage && (
           <span className="text-muted-foreground text-center text-sm mt-4">
             You looked at{' '}
             {data?.pages.reduce((acc, group) => acc + group.data.length, 0)}{' '}

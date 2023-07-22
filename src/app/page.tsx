@@ -80,11 +80,17 @@ export default function Home() {
         </div>
       </div>
 
-      <div className="container mx-auto flex flex-col items-center max-md:mt-10">
+      <div className="container mx-auto flex justify-center gap-2 items-center max-md:mt-10">
         <Link href="/generate" className="relative">
           <div className="absolute top-0 blur-md h-full w-full inset-0 bg-gradient-to-r from-slate-600 to-indigo-500 group-hover:-inset-0.5 duration-100" />
           <Button size="lg" variant="default" className="text-lg relative">
             Start generating
+          </Button>
+        </Link>
+
+        <Link href="/shared-names">
+          <Button size="lg" variant="outline">
+            Brandix community
           </Button>
         </Link>
       </div>

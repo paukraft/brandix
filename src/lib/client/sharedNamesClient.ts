@@ -21,3 +21,13 @@ export const getTopNamesClient = async ({
 
   return { data: names, nextCursor }
 }
+
+export const getNameClient = async (name: string) => {
+  const response = await fetch(`/api/get-name?name=${name}`, {
+    method: 'GET',
+  })
+
+  const { name: nameFromDB }: { name: Name } = await response.json()
+
+  return nameFromDB
+}

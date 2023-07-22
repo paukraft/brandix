@@ -12,8 +12,30 @@ datasource db {
 }
 
 model Name {
-  id        String   @id @default(cuid())
-  createdAt DateTime @default(now())
-  name      String   @unique
-  votes     Int      @default(0)
+  id          String   @id @default(cuid())
+  createdAt   DateTime @default(now())
+  name        String   @unique
+  description String   @default("") @db.MediumText
+  score       Int      @default(0)
+
+  votes Int @default(0)
+
+  uniqueness               Int    @default(0)
+  uniquenessDescription    String @default("")
+  memorability             Int    @default(0)
+  memorabilityDescription  String @default("")
+  pronunciation            Int    @default(0)
+  pronunciationDescription String @default("")
+  spelling                 Int    @default(0)
+  spellingDescription      String @default("")
+  positivity               Int    @default(0)
+  positivityDescription    String @default("")
+  versatility              Int    @default(0)
+  versatilityDescription   String @default("")
+  globalAppeal             Int    @default(0)
+  globalAppealDescription  String @default("")
+
+  // Self relation
+  similarNames Name[] @relation("SimilarNames")
+  similarTo    Name[] @relation("SimilarNames")
 }

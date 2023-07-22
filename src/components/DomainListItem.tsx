@@ -1,6 +1,7 @@
 import { Domain } from '@/app/generate/page'
 import { cn } from '@/lib/utils'
 import { Share2, Star, Wand2 } from 'lucide-react'
+import Link from 'next/link'
 import { Dispatch, SetStateAction, useState } from 'react'
 import { CopyButton } from './ui/CopyButton'
 import { SimpleTooltip } from './ui/SimpleTooltip'
@@ -61,26 +62,33 @@ export const DomainListItem = ({
 
       <div className="flex gap-3 md:gap-4 items-center">
         <div className="flex md:hidden group-hover/item:flex text-xs gap-1 md:gap-2 dark:text-gray-400">
-          <SimpleTooltip title="Share with brandix community">
-            <button
-              disabled={shared}
-              onClick={async () => {
-                fetch('api/share-name', {
-                  method: 'POST',
-                  body: JSON.stringify({
-                    name: domain.name,
-                  }),
-                })
+          {shared ? (
+            <SimpleTooltip title="Go to shared page">
+              <Link href={`/shared-names/${domain.name}`} target="_blank">
+                <Share2 fill="currentColor" size={16} />
+              </Link>
+            </SimpleTooltip>
+          ) : (
+            <SimpleTooltip title="Share with brandix community">
+              <button
+                onClick={async () => {
+                  fetch('api/share-name', {
+                    method: 'POST',
+                    body: JSON.stringify({
+                      name: domain.name,
+                    }),
+                  })
 
-                setShared(true)
-                toast({
-                  title: 'Shared with community',
-                })
-              }}
-            >
-              <Share2 fill={shared ? 'currentColor' : 'none'} size={16} />
-            </button>
-          </SimpleTooltip>
+                  setShared(true)
+                  toast({
+                    title: 'Shared with community',
+                  })
+                }}
+              >
+                <Share2 size={16} />
+              </button>
+            </SimpleTooltip>
+          )}
 
           <SimpleTooltip
             title={isFavorite ? 'Remove from favorites' : 'Add to favorites'}

@@ -4,11 +4,17 @@ import { ReactQueryDevtools } from '@tanstack/react-query-devtools'
 
 export const queryClient = new QueryClient()
 
-export const ReactQuery = ({ children }: { children: React.ReactNode }) => {
+export const ReactQuery = ({
+  children,
+  noDevtools = false,
+}: {
+  children: React.ReactNode
+  noDevtools?: boolean
+}) => {
   return (
     <QueryClientProvider client={queryClient}>
       {children}
-      <ReactQueryDevtools initialIsOpen={false} />
+      {!noDevtools && <ReactQueryDevtools initialIsOpen={false} />}
     </QueryClientProvider>
   )
 }
