@@ -8,29 +8,17 @@ import { UpvoteWrapper } from '@/components/shared-names/UpvoteWrapper'
 import { CircularProgessbar } from '@/components/ui/circular-progessbar'
 import { Hr } from '@/components/ui/hr'
 import { Skeleton } from '@/components/ui/skeleton'
+import { getNameFromDB } from '@/lib/getNameFromDB'
 import { cn } from '@/lib/utils'
 import { map, range } from 'lodash'
 import { ChevronLeft } from 'lucide-react'
+import { Metadata, ResolvingMetadata } from 'next'
 import Link from 'next/link'
 import { PropsWithChildren, Suspense } from 'react'
 
-export const Card = ({
-  children,
-  className,
-}: PropsWithChildren<{ className?: string }>) => {
-  return (
-    <div
-      className={cn(
-        'p-6 rounded-lg gap-2 border border-input dark:bg-zinc-900/10 flex flex-col w-fit',
-        className
-      )}
-    >
-      {children}
-    </div>
-  )
-}
+type Props = { params: { name: string } }
 
-export default function Home({ params }: { params: { name: string } }) {
+export default function Home({ params }: Props) {
   const nameParam = decodeURIComponent(params.name)
 
   return (
@@ -77,6 +65,7 @@ export default function Home({ params }: { params: { name: string } }) {
             fallback={
               <>
                 <Skeleton className="w-full" />
+                <Skeleton className="w-full md:w-2/3" />
                 <div className="md:hidden">
                   <Skeleton className="w-2/3" />
                 </div>
@@ -114,4 +103,48 @@ export default function Home({ params }: { params: { name: string } }) {
       </div>
     </div>
   )
+}
+
+export const Card = ({
+  children,
+  className,
+}: PropsWithChildren<{ className?: string }>) => {
+  return (
+    <div
+      className={cn(
+        'p-6 rounded-lg gap-2 border border-input dark:bg-zinc-900/10 flex flex-col w-fit',
+        className
+      )}
+    >
+      {children}
+    </div>
+  )
+}
+
+export async function generateMetadata(
+  { params }: Props,
+  parent: ResolvingMetadata
+): Promise<Metadata> {
+  const nameParam = decodeURIComponent(params.name)
+
+  const nameFromDB = await getNameFromDB({
+    name: nameParam,
+    generate: [],
+  })
+
+  const title = `${nameFromDB.name} - Analyzed Brand Name | Brandix`
+  const description = `Check out the analysis of the brand name ${nameFromDB.name} on Brandix. It has a score of ${nameFromDB.score} and is described as: ${nameFromDB.description}.`
+
+  return {
+    title: title,
+    description: description,
+    openGraph: {
+      title: title,
+      description: description,
+    },
+    twitter: {
+      title: title,
+      description: description,
+    },
+  }
 }

@@ -17,15 +17,18 @@ export const askGPT = cache(
     model,
     messages,
     functions = undefined,
+    temperature = 1,
   }: {
     model: OpenAIModel
     messages: ChatCompletionRequestMessage[]
     functions?: ChatCompletionFunctions[]
+    temperature?: number
   }) => {
     const chatCompletion = await openai.createChatCompletion({
       model,
       messages: messages,
       functions,
+      temperature: temperature,
     })
 
     return chatCompletion.data.choices[0]
