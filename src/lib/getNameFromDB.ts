@@ -247,17 +247,21 @@ export const getNameFromDB = cache(
           messages: [
             {
               role: 'system',
-              content: `You are brandnameGPT, your job is to generate brandname variations for a company which in the best case arent taken already. Always return exact ${nrOfSimilarNames} brandnames.`,
+              content: `You are brandnameGPT, your job is to generate Brandnames for a company which in the best case arent taken already.`,
+            },
+            {
+              role: 'assistant',
+              content: name,
             },
             {
               role: 'user',
-              content: `Give me ${nrOfSimilarNames} more variations similar to ${name}. Should be available as a .com domain.`,
+              content: `Give me ${nrOfSimilarNames} more variations similar to ${name}, only brandnames no description or tagline`,
             },
           ],
           functions: [
             {
-              name: 'sendSimilarNames',
-              description: `Send ${nrOfSimilarNames} similar names to this function`,
+              name: 'sendNames',
+              description: `Send ${nrOfSimilarNames} names to this function`,
               parameters: transformZodSchemaToOpenAi(similarNamesSchema),
             },
           ],
