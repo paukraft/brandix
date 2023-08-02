@@ -10,12 +10,11 @@ import { CircularProgessbar } from '@/components/ui/circular-progessbar'
 import { Hr } from '@/components/ui/hr'
 import { Skeleton } from '@/components/ui/skeleton'
 import { getNameFromDB } from '@/lib/getNameFromDB'
-import { cn } from '@/lib/utils'
 import { map, range } from 'lodash'
 import { ChevronLeft } from 'lucide-react'
 import { Metadata, ResolvingMetadata } from 'next'
 import Link from 'next/link'
-import { PropsWithChildren, Suspense } from 'react'
+import { Suspense } from 'react'
 
 type Props = { params: { name: string } }
 
@@ -104,22 +103,6 @@ export default function Home({ params }: Props) {
           <SimilarNames name={nameParam} />
         </Suspense>
       </div>
-    </div>
-  )
-}
-
-export const Card = ({
-  children,
-  className,
-}: PropsWithChildren<{ className?: string }>) => {
-  return (
-    <div
-      className={cn(
-        'p-6 rounded-lg gap-2 border border-input dark:bg-zinc-900/10 flex flex-col w-fit',
-        className
-      )}
-    >
-      {children}
     </div>
   )
 }

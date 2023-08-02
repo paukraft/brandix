@@ -1,6 +1,6 @@
-import { Card } from '@/app/shared-names/[name]/page'
 import { getNameFromDB } from '@/lib/getNameFromDB'
 import Link from 'next/link'
+import { Card } from '../card'
 import { ScrollArea, ScrollBar } from '../ui/scroll-area'
 
 type Props = {
