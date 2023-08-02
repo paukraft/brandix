@@ -12,12 +12,13 @@ export const SimilarNames = async ({ name }: Props) => {
     name,
     generate: ['similar'],
   })
+
   return (
     <ScrollArea>
       <div className="flex gap-4">
         {/* Map over max 5 names */}
         {nameFromDB?.similarNames?.slice(0, 5).map((name) => (
-          <Link href={`/shared-names/${name}`} key={name}>
+          <Link href={`/shared-names/${name}`} key={name} rel="nofollow">
             <Card className="w-full p-0 py-1 px-2">
               <span>{name}</span>
             </Card>

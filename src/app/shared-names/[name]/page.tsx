@@ -1,4 +1,5 @@
 import { ReactQuery } from '@/components/ReactQuery'
+import { AccordionText } from '@/components/accordion-text'
 import { NameDescription } from '@/components/shared-names/NameDescription'
 import { OverallScore } from '@/components/shared-names/OverallScore'
 import { Scores } from '@/components/shared-names/Scores'
@@ -39,15 +40,17 @@ export default function Home({ params }: Props) {
           </div>
 
           <div className="flex-1 flex xs:justify-end gap-3 items-center">
-            <Suspense
-              fallback={
-                <div className="animate-pulse">
-                  <CircularProgessbar value={0} size="small" />
-                </div>
-              }
-            >
-              <OverallScore name={nameParam} />
-            </Suspense>
+            <div className="max-xs:flex-1">
+              <Suspense
+                fallback={
+                  <div className="animate-pulse">
+                    <CircularProgessbar value={0} size="small" />
+                  </div>
+                }
+              >
+                <OverallScore name={nameParam} />
+              </Suspense>
+            </div>
 
             <ShareButton name={nameParam} />
 
@@ -60,7 +63,7 @@ export default function Home({ params }: Props) {
         </div>
 
         {/* Description */}
-        <div className="text-slate-500 dark:text-slate-300 rounded-lg bg-slate-50 dark:bg-slate-900 p-3">
+        <AccordionText className="text-slate-500 dark:text-slate-300 rounded-lg bg-slate-50 dark:bg-slate-900 p-3 whitespace-pre-line">
           <Suspense
             fallback={
               <>
@@ -74,7 +77,7 @@ export default function Home({ params }: Props) {
           >
             <NameDescription name={nameParam} />
           </Suspense>
-        </div>
+        </AccordionText>
       </div>
 
       <Hr />
@@ -133,7 +136,7 @@ export async function generateMetadata(
   })
 
   const title = `${nameFromDB.name} - Analyzed Brand Name | Brandix`
-  const description = `Check out the analysis of the brand name ${nameFromDB.name} on Brandix. It has a score of ${nameFromDB.score} and is described as: ${nameFromDB.description}.`
+  const description = `Check out the brand name analysis of "${nameFromDB.name}" on Brandix. It has a score of ${nameFromDB.score} and is described as: ${nameFromDB.description}.`
 
   return {
     title: title,

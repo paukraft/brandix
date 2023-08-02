@@ -34,7 +34,7 @@ export const NavBar = () => {
 
           {/* CTA */}
           <div className="flex items-center">
-            <Link href="/shared-names">
+            <Link href="/shared-names" className="max-sm:hidden">
               <Button variant="link">Community Names</Button>
             </Link>
             <Button variant="ghost" size="icon" name="My personal twitter">
