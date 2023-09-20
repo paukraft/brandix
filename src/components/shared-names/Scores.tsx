@@ -6,7 +6,10 @@ type Props = {
 }
 
 export const Scores = async ({ name }: Props) => {
-  const nameFromDB = await getNameFromDB({ name, generate: ['scores'] })
+  const nameFromDB = await getNameFromDB({
+    name,
+    generate: ['scores'],
+  })
 
   if (!nameFromDB) return null
 

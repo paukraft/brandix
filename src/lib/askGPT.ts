@@ -3,6 +3,7 @@ import {
   ChatCompletionFunctions,
   ChatCompletionRequestMessage,
   Configuration,
+  CreateChatCompletionRequest,
   OpenAIApi,
 } from 'openai'
 import { cache } from 'react'
@@ -18,13 +19,16 @@ export const askGPT = cache(
     messages,
     functions = undefined,
     temperature = 1,
+    options,
   }: {
     model: OpenAIModel
     messages: ChatCompletionRequestMessage[]
     functions?: ChatCompletionFunctions[]
     temperature?: number
+    options?: Partial<CreateChatCompletionRequest>
   }) => {
     const chatCompletion = await openai.createChatCompletion({
+      ...options,
       model,
       messages: messages,
       functions,

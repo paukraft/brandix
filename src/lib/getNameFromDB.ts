@@ -5,37 +5,26 @@ import { askGPT } from './askGPT'
 import { prisma } from './prisma'
 import { transformZodSchemaToOpenAi } from './transformZodSchemaToOpenAi'
 
-const MAX_SCORE_DESCRIPTION_LENGTH = 300
+const des = 'detailed assessment'
 
-const scoreSchema = z.object({
-  uniqueness: z.object({
-    score: z.number().int().min(0).max(100),
-    description: z.string().min(0).max(MAX_SCORE_DESCRIPTION_LENGTH),
-  }),
-  memorability: z.object({
-    score: z.number().int().min(0).max(100),
-    description: z.string().min(0).max(MAX_SCORE_DESCRIPTION_LENGTH),
-  }),
-  pronunciation: z.object({
-    score: z.number().int().min(0).max(100),
-    description: z.string().min(0).max(MAX_SCORE_DESCRIPTION_LENGTH),
-  }),
-  spelling: z.object({
-    score: z.number().int().min(0).max(100),
-    description: z.string().min(0).max(MAX_SCORE_DESCRIPTION_LENGTH),
-  }),
-  positivity: z.object({
-    score: z.number().int().min(0).max(100),
-    description: z.string().min(0).max(MAX_SCORE_DESCRIPTION_LENGTH),
-  }),
-  versatility: z.object({
-    score: z.number().int().min(0).max(100),
-    description: z.string().min(0).max(MAX_SCORE_DESCRIPTION_LENGTH),
-  }),
-  globalAppeal: z.object({
-    score: z.number().int().min(0).max(100),
-    description: z.string().min(0).max(MAX_SCORE_DESCRIPTION_LENGTH),
-  }),
+const scoreDescriptionSchema = z.object({
+  uniqueness: z.string().describe(des),
+  memorability: z.string().describe(des),
+  pronunciation: z.string().describe(des),
+  spelling: z.string().describe(des),
+  positivity: z.string().describe(des),
+  versatility: z.string().describe(des),
+  globalAppeal: z.string().describe(des),
+})
+
+const scoreScoreSchema = z.object({
+  uniqueness: z.number().int().min(0).max(100),
+  memorability: z.number().int().min(0).max(100),
+  pronunciation: z.number().int().min(0).max(100),
+  spelling: z.number().int().min(0).max(100),
+  positivity: z.number().int().min(0).max(100),
+  versatility: z.number().int().min(0).max(100),
+  globalAppeal: z.number().int().min(0).max(100),
 })
 
 const getSimilarNames = ({
@@ -65,7 +54,7 @@ const getSimilarNames = ({
 export const getNameFromDB = cache(
   async ({
     name,
-    generate = ['description', 'scores', 'similar'],
+    generate = [],
   }: {
     name: string
     generate?: ('description' | 'scores' | 'similar')[]
@@ -90,7 +79,7 @@ export const getNameFromDB = cache(
 
     let similarNames = getSimilarNames({ nameFromDB })
 
-    const updates = await Promise.all([
+    const updates = await Promise.allSettled([
       new Promise(async (resolve) => {
         // Check if description generation is needed
         if (!generate.includes('description') || nameFromDB?.description) {
@@ -159,34 +148,74 @@ export const getNameFromDB = cache(
           return resolve(false)
         }
 
-        // Generate scores using GPT
-        const scoring = await askGPT({
+        console.log('Generating scores for', name, generate)
+
+        // Generate analysations to each criteria using GPT
+        const gptAnalysation = await askGPT({
           model: 'gpt-3.5-turbo',
           messages: [
             {
               role: 'system',
-              content: `You are a brand analyst. There is a sendScores function with lots of criteria. Give a score from 0 to 100 to each criteria. And give a description to each criteria why the name is good or not good.`,
+              content: `You are a Market Research Analyst. Your task is to evaluate a brand or business name based on various criteria. You need to provide a detailed assessment, explaining the strengths or weaknesses for each criterion. Do not simply label it as 'good' or 'strong'. Provide reasons.`,
             },
             {
               role: 'user',
-              content: `Give scores and descriptions to the name "${name}" to each criteria.`,
+              content: `${name}`,
             },
           ],
+          options: {
+            function_call: { name: 'sendAnalysation' },
+          },
           functions: [
             {
-              name: 'sendScores',
-              description: 'Send the scores and descriptions to this function',
-              parameters: transformZodSchemaToOpenAi(scoreSchema),
+              name: 'sendAnalysation',
+              description: 'Send your detailed assessments to this function',
+              parameters: transformZodSchemaToOpenAi(scoreDescriptionSchema),
             },
           ],
           temperature: 0.5,
         })
 
-        const scores = scoreSchema.parse(
-          JSON.parse(scoring.message?.function_call?.arguments || '{}')
+        console.log(gptAnalysation.message)
+
+        const analysations = scoreDescriptionSchema.parse(
+          JSON.parse(gptAnalysation.message?.function_call?.arguments || '{}')
         )
 
-        const scoresArray = map(Object.values(scores), (score) => score.score)
+        console.log(analysations)
+
+        const gptScores = await askGPT({
+          model: 'gpt-3.5-turbo',
+          messages: [
+            {
+              role: 'system',
+              content: `As an Analyst, you'll use the previous analyst's evaluations to rate a brand name. For each criterion, assign a score from 0-100. High scores are for positive evaluations, low scores for negative ones, and neutral evaluations should receive a score of 50. You are not evaluating the analyst's work, but using their analysis to score the brand name.`,
+            },
+            {
+              role: 'user',
+              content: `${analysations}`,
+            },
+          ],
+          options: {
+            function_call: { name: 'sendScores' },
+          },
+          functions: [
+            {
+              name: 'sendScores',
+              description: 'Send your scores to this function',
+              parameters: transformZodSchemaToOpenAi(scoreScoreSchema),
+            },
+          ],
+          temperature: 0.5,
+        })
+
+        console.log(gptScores.message)
+
+        const scores = scoreScoreSchema.parse(
+          JSON.parse(gptScores.message?.function_call?.arguments || '{}')
+        )
+
+        const scoresArray = map(Object.values(scores), (score) => score)
 
         const generalScore =
           scoresArray.reduce((acc, curr) => acc + curr, 0) / scoresArray.length
@@ -210,20 +239,20 @@ export const getNameFromDB = cache(
           },
           data: {
             score: generalScore,
-            uniqueness: scores.uniqueness.score,
-            uniquenessDescription: scores.uniqueness.description,
-            memorability: scores.memorability.score,
-            memorabilityDescription: scores.memorability.description,
-            pronunciation: scores.pronunciation.score,
-            pronunciationDescription: scores.pronunciation.description,
-            spelling: scores.spelling.score,
-            spellingDescription: scores.spelling.description,
-            positivity: scores.positivity.score,
-            positivityDescription: scores.positivity.description,
-            versatility: scores.versatility.score,
-            versatilityDescription: scores.versatility.description,
-            globalAppeal: scores.globalAppeal.score,
-            globalAppealDescription: scores.globalAppeal.description,
+            uniqueness: scores.uniqueness,
+            uniquenessDescription: analysations.uniqueness,
+            memorability: scores.memorability,
+            memorabilityDescription: analysations.memorability,
+            pronunciation: scores.pronunciation,
+            pronunciationDescription: analysations.pronunciation,
+            spelling: scores.spelling,
+            spellingDescription: analysations.spelling,
+            positivity: scores.positivity,
+            positivityDescription: analysations.positivity,
+            versatility: scores.versatility,
+            versatilityDescription: analysations.versatility,
+            globalAppeal: scores.globalAppeal,
+            globalAppealDescription: analysations.globalAppeal,
           },
         })
 
@@ -322,7 +351,12 @@ export const getNameFromDB = cache(
       }),
     ])
 
-    if (some(updates)) {
+    const updatesFullfilled = updates.filter(
+      (update): update is PromiseFulfilledResult<boolean> =>
+        update.status === 'fulfilled'
+    )
+
+    if (some(updatesFullfilled, (update) => update.value)) {
       nameFromDB = await prisma.name.findUnique({
         where: {
           name,
