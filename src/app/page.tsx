@@ -5,6 +5,7 @@ import {
   AccordionItem,
   AccordionTrigger,
 } from '@/components/ui/accordion'
+import { AnimatedNumber } from '@/components/ui/animated-number'
 
 import { Button } from '@/components/ui/button'
 import { cn } from '@/lib/utils'
@@ -163,16 +164,16 @@ export default function Home() {
                 <dt className="text-base leading-7 text-gray-500 dark:text-gray-400">
                   Generated Names
                 </dt>
-                <dd className="order-first text-3xl font-semibold tracking-tight sm:text-5xl">
-                  40.000+
+                <dd className="order-first text-3xl font-semibold tracking-tight sm:text-5xl tabular-nums flex items-center">
+                  <AnimatedNumber value={210000} />
                 </dd>
               </div>
               <div className="mx-auto flex max-w-xs flex-col gap-y-4">
                 <dt className="text-base leading-7 text-gray-500 dark:text-gray-400">
                   Total Users
                 </dt>
-                <dd className="order-first text-3xl font-semibold tracking-tight sm:text-5xl">
-                  1.900+
+                <dd className="order-first text-3xl font-semibold tracking-tight sm:text-5xl tabular-nums">
+                  10.000+
                 </dd>
               </div>
             </dl>
