@@ -62,7 +62,7 @@ export default function Home({ params }: Props) {
         </div>
 
         {/* Description */}
-        <AccordionText className="text-slate-500 dark:text-slate-300 rounded-lg bg-slate-50 dark:bg-slate-900 p-3 whitespace-pre-line">
+        <AccordionText>
           <Suspense
             fallback={
               <>

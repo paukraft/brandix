@@ -12,17 +12,19 @@ const AccordionText = React.forwardRef<
 
   return (
     <div className={cn('flex flex-col items-center gap-2')}>
-      <div
-        className={cn(
-          'overflow-hidden text-sm w-full',
-          isExpanded ? 'line-clamp-none' : `line-clamp-2 cursor-pointer`,
-          className
-        )}
-        onClick={() => !isExpanded && setIsExpanded(!isExpanded)}
-        {...props}
-        ref={ref}
-      >
-        {children}
+      <div className="rounded-lg bg-slate-50 dark:bg-slate-900 p-3">
+        <div
+          className={cn(
+            'overflow-hidden text-sm w-full transition-all whitespace-pre-line',
+            isExpanded ? 'line-clamp-none' : `line-clamp-2 cursor-pointer`,
+            className
+          )}
+          onClick={() => !isExpanded && setIsExpanded(!isExpanded)}
+          {...props}
+          ref={ref}
+        >
+          {children}
+        </div>
       </div>
       <button
         className="flex gap-1 items-center text-xs"
