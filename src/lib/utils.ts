@@ -12,7 +12,7 @@ export const getColorClass = ({
   value: number
   as?: 'text' | 'bg'
 }) => {
-  if (value <= 50)
+  if (value < 50)
     return as === 'text'
       ? 'text-red-500 dark:text-red-600'
       : 'bg-red-500 dark:bg-red-600'

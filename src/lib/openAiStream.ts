@@ -9,7 +9,11 @@ export type Message = {
   content: string
 }
 
-export type OpenAIModel = 'gpt-4' | 'gpt-3.5-turbo' | 'gpt-3.5-turbo-0613'
+export type OpenAIModel =
+  | 'gpt-4'
+  | 'gpt-3.5-turbo'
+  | 'gpt-3.5-turbo-0613'
+  | 'gpt-4-1106-preview'
 
 export const openAIStream = async ({
   model,

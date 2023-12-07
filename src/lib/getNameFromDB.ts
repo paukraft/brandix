@@ -2,29 +2,30 @@ import { filter, map, some, uniq } from 'lodash'
 import { cache } from 'react'
 import { z } from 'zod'
 import { askGPT } from './askGPT'
+import { OpenAIModel } from './openAiStream'
 import { prisma } from './prisma'
 import { transformZodSchemaToOpenAi } from './transformZodSchemaToOpenAi'
 
-const des = 'detailed assessment'
+const llmToUse: OpenAIModel = 'gpt-4-1106-preview'
 
 const scoreDescriptionSchema = z.object({
-  uniqueness: z.string().describe(des),
-  memorability: z.string().describe(des),
-  pronunciation: z.string().describe(des),
-  spelling: z.string().describe(des),
-  positivity: z.string().describe(des),
-  versatility: z.string().describe(des),
-  globalAppeal: z.string().describe(des),
+  uniqueness: z.string(),
+  memorability: z.string(),
+  pronunciation: z.string(),
+  spelling: z.string(),
+  positivity: z.string(),
+  versatility: z.string(),
+  globalAppeal: z.string(),
 })
 
 const scoreScoreSchema = z.object({
-  uniqueness: z.number().int().min(0).max(100),
-  memorability: z.number().int().min(0).max(100),
-  pronunciation: z.number().int().min(0).max(100),
-  spelling: z.number().int().min(0).max(100),
-  positivity: z.number().int().min(0).max(100),
-  versatility: z.number().int().min(0).max(100),
-  globalAppeal: z.number().int().min(0).max(100),
+  uniqueness: z.number(),
+  memorability: z.number(),
+  pronunciation: z.number(),
+  spelling: z.number(),
+  positivity: z.number(),
+  versatility: z.number(),
+  globalAppeal: z.number(),
 })
 
 const getSimilarNames = ({
@@ -80,6 +81,7 @@ export const getNameFromDB = cache(
     let similarNames = getSimilarNames({ nameFromDB })
 
     const updates = await Promise.allSettled([
+      // Description
       new Promise(async (resolve) => {
         // Check if description generation is needed
         if (!generate.includes('description') || nameFromDB?.description) {
@@ -88,7 +90,7 @@ export const getNameFromDB = cache(
 
         // Generate new description using GPT
         const newDescriptionCompletion = await askGPT({
-          model: 'gpt-3.5-turbo',
+          model: llmToUse,
           messages: [
             {
               role: 'system',
@@ -142,17 +144,16 @@ export const getNameFromDB = cache(
 
         return resolve(true)
       }),
+      // Scores
       new Promise(async (resolve) => {
         // Check if score generation is needed
         if (!generate.includes('scores') || nameFromDB?.score) {
           return resolve(false)
         }
 
-        console.log('Generating scores for', name, generate)
-
         // Generate analysations to each criteria using GPT
         const gptAnalysation = await askGPT({
-          model: 'gpt-3.5-turbo',
+          model: llmToUse,
           messages: [
             {
               role: 'system',
@@ -173,27 +174,34 @@ export const getNameFromDB = cache(
               parameters: transformZodSchemaToOpenAi(scoreDescriptionSchema),
             },
           ],
-          temperature: 0.5,
+          temperature: 0.7,
         })
-
-        console.log(gptAnalysation.message)
 
         const analysations = scoreDescriptionSchema.parse(
           JSON.parse(gptAnalysation.message?.function_call?.arguments || '{}')
         )
 
-        console.log(analysations)
-
         const gptScores = await askGPT({
-          model: 'gpt-3.5-turbo',
+          model: llmToUse,
           messages: [
             {
               role: 'system',
-              content: `As an Analyst, you'll use the previous analyst's evaluations to rate a brand name. For each criterion, assign a score from 0-100. High scores are for positive evaluations, low scores for negative ones, and neutral evaluations should receive a score of 50. You are not evaluating the analyst's work, but using their analysis to score the brand name.`,
+              content:
+                'You are brandnameGPT, you job is to give scores in different criteria to a given brandname. Scores are from 0 to 100, 100 being the best. Another analyst has given an analasys in text form to each criteria before. Your scores should be based on that.',
             },
             {
               role: 'user',
-              content: `${analysations}`,
+              content: `
+              Brandname: ${name}
+              Analysation:
+              Uniqueness: ${analysations.uniqueness}
+              Memorability: ${analysations.memorability}
+              Pronunciation: ${analysations.pronunciation}
+              Spelling: ${analysations.spelling}
+              Positivity: ${analysations.positivity}
+              Versatility: ${analysations.versatility}
+              Global Appeal: ${analysations.globalAppeal}
+              `,
             },
           ],
           options: {
@@ -206,10 +214,8 @@ export const getNameFromDB = cache(
               parameters: transformZodSchemaToOpenAi(scoreScoreSchema),
             },
           ],
-          temperature: 0.5,
+          temperature: 0.7,
         })
-
-        console.log(gptScores.message)
 
         const scores = scoreScoreSchema.parse(
           JSON.parse(gptScores.message?.function_call?.arguments || '{}')
@@ -258,6 +264,7 @@ export const getNameFromDB = cache(
 
         return resolve(true)
       }),
+      // Similar names
       new Promise(async (resolve) => {
         // Check if similar names generation is needed
         if (!generate.includes('similar') || similarNames.length >= 5) {
@@ -272,7 +279,7 @@ export const getNameFromDB = cache(
 
         // Generate new similar names using GPT
         const newSimilarNamesREQ = await askGPT({
-          model: 'gpt-3.5-turbo',
+          model: llmToUse,
           messages: [
             {
               role: 'system',
