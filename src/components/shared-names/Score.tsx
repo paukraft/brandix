@@ -60,9 +60,5 @@ export const Score = async ({
         </AccordionPrimitive.Content>
       </AccordionPrimitive.Item>
     </AccordionPrimitive.Root>
-    // <Card className="w-full flex flex-col items-center gap-2">
-    //   <span className="text-white text-lg">{name}</span>
-    //   <CircularProgessbar value={score} />
-    // </Card>
   )
 }

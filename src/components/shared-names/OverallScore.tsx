@@ -7,7 +7,10 @@ type Props = {
 }
 
 export const OverallScore = async ({ name }: Props) => {
-  const nameFromDB = await getNameFromDB({ name })
+  const nameFromDB = await getNameFromDB({
+    name,
+    generate: ['scores'],
+  })
 
   return (
     <SimpleTooltip title="Overall score">
