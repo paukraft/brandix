@@ -1,5 +1,8 @@
 import { ReactQuery } from '@/components/ReactQuery'
 import { SharedNamesList } from '@/components/shared-names/SharedNamesList'
+import { Skeleton } from '@/components/ui/skeleton'
+import { map, range } from 'lodash'
+import { Suspense } from 'react'
 
 export default function Home() {
   return (
@@ -13,9 +16,19 @@ export default function Home() {
         </span>
       </div>
 
-      <ReactQuery>
-        <SharedNamesList />
-      </ReactQuery>
+      <Suspense
+        fallback={
+          <div className="flex flex-col gap-6">
+            {map(range(7), (i) => (
+              <Skeleton key={i} className="w-full h-[48px]" />
+            ))}
+          </div>
+        }
+      >
+        <ReactQuery>
+          <SharedNamesList />
+        </ReactQuery>
+      </Suspense>
     </div>
   )
 }
