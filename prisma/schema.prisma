@@ -15,25 +15,25 @@ model Name {
   id          String   @id @default(cuid())
   createdAt   DateTime @default(now())
   name        String   @unique
-  description String   @default("") @db.MediumText
+  description String   @db.MediumText
   score       Int      @default(0)
 
   votes Int @default(0)
 
   uniqueness               Int    @default(0)
-  uniquenessDescription    String @default("") @db.MediumText
+  uniquenessDescription    String @db.MediumText
   memorability             Int    @default(0)
-  memorabilityDescription  String @default("") @db.MediumText
+  memorabilityDescription  String @db.MediumText
   pronunciation            Int    @default(0)
-  pronunciationDescription String @default("") @db.MediumText
+  pronunciationDescription String @db.MediumText
   spelling                 Int    @default(0)
-  spellingDescription      String @default("") @db.MediumText
+  spellingDescription      String @db.MediumText
   positivity               Int    @default(0)
-  positivityDescription    String @default("") @db.MediumText
+  positivityDescription    String @db.MediumText
   versatility              Int    @default(0)
-  versatilityDescription   String @default("") @db.MediumText
+  versatilityDescription   String @db.MediumText
   globalAppeal             Int    @default(0)
-  globalAppealDescription  String @default("") @db.MediumText
+  globalAppealDescription  String @db.MediumText
 
   // Self relation
   similarNames Name[] @relation("SimilarNames")

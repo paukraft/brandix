@@ -9,7 +9,7 @@ import { UpvoteWrapper } from '@/components/shared-names/UpvoteWrapper'
 import { CircularProgessbar } from '@/components/ui/circular-progessbar'
 import { Hr } from '@/components/ui/hr'
 import { Skeleton } from '@/components/ui/skeleton'
-import { getNameFromDB } from '@/lib/getNameFromDB'
+import { prisma } from '@/lib/prisma'
 import { map, range } from 'lodash'
 import { ChevronLeft } from 'lucide-react'
 import { Metadata, ResolvingMetadata } from 'next'
@@ -113,10 +113,13 @@ export async function generateMetadata(
 ): Promise<Metadata> {
   const nameParam = decodeURIComponent(params.name)
 
-  const nameFromDB = await getNameFromDB({
-    name: nameParam,
-    generate: [],
+  const nameFromDB = await prisma.name.findUnique({
+    where: { name: nameParam },
   })
+
+  if (!nameFromDB) {
+    return {}
+  }
 
   const title = `${nameFromDB.name} - Analyzed Brand Name | Brandix`
   const description = `Check out the brand name analysis of "${nameFromDB.name}" on Brandix. It has a score of ${nameFromDB.score} and is described as: ${nameFromDB.description}.`

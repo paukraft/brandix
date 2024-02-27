@@ -8,7 +8,7 @@ import { Progressbar } from '@/components/ui/progressbar'
 import * as AccordionPrimitive from '@radix-ui/react-accordion'
 import { ChevronRight } from 'lucide-react'
 
-export const Score = async ({
+export const Score = ({
   name,
   score,
   description,

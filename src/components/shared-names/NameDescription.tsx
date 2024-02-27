@@ -5,10 +5,7 @@ type Props = {
 }
 
 export const NameDescription = async ({ name }: Props) => {
-  const nameFromDB = await getNameFromDB({
-    name,
-    generate: ['description'],
-  })
+  const nameFromDB = await getNameFromDB(name)
 
   return <div>{nameFromDB?.description}</div>
 }

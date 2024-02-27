@@ -6,12 +6,7 @@ type Props = {
 }
 
 export const Scores = async ({ name }: Props) => {
-  const nameFromDB = await getNameFromDB({
-    name,
-    generate: ['scores'],
-  })
-
-  if (!nameFromDB) return null
+  const nameFromDB = await getNameFromDB(name)
 
   return (
     <div className="flex flex-col gap-6">

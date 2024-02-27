@@ -8,10 +8,7 @@ type Props = {
 }
 
 export const SimilarNames = async ({ name }: Props) => {
-  const nameFromDB = await getNameFromDB({
-    name,
-    generate: ['similar'],
-  })
+  const nameFromDB = await getNameFromDB(name)
 
   return (
     <ScrollArea>

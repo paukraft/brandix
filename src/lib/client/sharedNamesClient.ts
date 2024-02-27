@@ -1,4 +1,5 @@
 import { Name } from '@prisma/client'
+import { getNameFromDB } from '../getNameFromDB'
 
 export const getTopNamesClient = async ({
   pageParam,
@@ -27,7 +28,8 @@ export const getNameClient = async (name: string) => {
     method: 'GET',
   })
 
-  const { name: nameFromDB }: { name: Name } = await response.json()
+  const { name: nameFromDB }: { name: ReturnType<typeof getNameFromDB> } =
+    await response.json()
 
   return nameFromDB
 }

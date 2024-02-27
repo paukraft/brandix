@@ -26,7 +26,7 @@ export const UpvoteWrapper = ({
     <SimpleTooltip title="Upvotes">
       <UpvoteButton
         name={name}
-        votes={data.votes}
+        votes={data.votes ?? 0}
         refetch={refetch}
         styledButton={styledButton}
       />
