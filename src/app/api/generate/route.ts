@@ -25,7 +25,7 @@ export async function POST(req: NextRequest) {
   }
 
   const { stream } = await openAIStream({
-    model: 'gpt-3.5-turbo-0613',
+    model: 'gpt-3.5-turbo',
     messages: [
       {
         content:
