@@ -1,17 +1,20 @@
 import { SimpleTooltip } from '@/components/ui/SimpleTooltip'
 import { CircularProgessbar } from '@/components/ui/circular-progessbar'
-import { getNameFromDB } from '@/lib/getNameFromDB'
+import { generateScoresComplete } from '@/lib/getNameFromDB'
 
 type Props = {
   name: string
 }
 
 export const OverallScore = async ({ name }: Props) => {
-  const nameFromDB = await getNameFromDB(name)
+  const nameFromDB = await generateScoresComplete(name)
 
   return (
     <SimpleTooltip title="Overall score">
-      <CircularProgessbar value={nameFromDB.score ?? 0} size="small" />
+      <CircularProgessbar
+        value={nameFromDB.scores.generalScore ?? 0}
+        size="small"
+      />
     </SimpleTooltip>
   )
 }

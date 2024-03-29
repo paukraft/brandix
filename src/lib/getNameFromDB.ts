@@ -1,4 +1,5 @@
 import { filter, map, uniq } from 'lodash'
+import { notFound } from 'next/navigation'
 import { cache } from 'react'
 import { z } from 'zod'
 import { askGPT } from './askGPT'
@@ -7,9 +8,10 @@ import { prisma } from './prisma'
 import { newNameData } from './sharedNames'
 import { transformZodSchemaToOpenAi } from './transformZodSchemaToOpenAi'
 
-const llmToUse: OpenAIModel = 'gpt-4-1106-preview'
-
-const desiredSimilarNames = 5
+const llmForDescription: OpenAIModel = 'gpt-4-1106-preview'
+const llmForTextAnalysis: OpenAIModel = 'gpt-4-1106-preview'
+const llmForScores: OpenAIModel = 'gpt-3.5-turbo'
+const llmForSimilarNames: OpenAIModel = 'gpt-3.5-turbo'
 
 const scoreDescriptionSchema = z.object({
   uniquenessDescription: z.string(),
@@ -35,7 +37,7 @@ const similarNamesSchema = z.object({
   similarNames: z.array(z.string()),
 })
 
-export const getNameFromDB = cache(async (name: string) => {
+export const getInitialName = cache(async (name: string) => {
   const initialName = await prisma.name.findUnique({
     where: {
       name,
@@ -46,146 +48,101 @@ export const getNameFromDB = cache(async (name: string) => {
     },
   })
 
-  const initialSimilarNames = getSimilarNames({ nameFromDB: initialName })
-
-  const promises = [
-    async () => {
-      if (!initialName?.description) {
-        const description = await generateDescription(name)
-
-        return description
-      }
-    },
-    async () => {
-      if (initialName?.uniquenessDescription === '') {
-        const textAnalysis = await generateTextAnalysis(name)
-        const scores = await generateScores(name, textAnalysis)
-
-        return {
-          textAnalysis,
-          scores,
-        }
-      }
-    },
-    async () => {
-      if (initialSimilarNames.length < desiredSimilarNames) {
-        const similarNames = await generateSimilarNames(
-          name,
-          desiredSimilarNames - initialSimilarNames.length
-        )
-
-        return similarNames
-      }
-    },
-  ]
-
-  const results = await Promise.allSettled(promises.map((p) => p()))
-
-  const newDescription =
-    results[0].status === 'fulfilled' &&
-    (results[0].value as string | undefined)
-  const newTextAnalysis =
-    results[1].status === 'fulfilled' &&
-    (results[1].value as
-      | {
-          textAnalysis: z.infer<typeof scoreDescriptionSchema>
-          scores: {
-            scores: z.infer<typeof scoreScoreSchema>
-            generalScore: number
-          }
-        }
-      | undefined)
-  const newSimilarNames =
-    results[2].status === 'fulfilled' &&
-    (results[2].value as
-      | z.infer<typeof similarNamesSchema>['similarNames']
-      | undefined)
-
-  // If any of the results isn't undefined, update the database
-  if (newDescription || newTextAnalysis || newSimilarNames) {
-    const descriptionUpdate = newDescription
-      ? {
-          description: newDescription,
-        }
-      : {}
-
-    const textAnalysisUpdate = newTextAnalysis
-      ? {
-          ...newTextAnalysis.textAnalysis,
-          ...newTextAnalysis.scores.scores,
-          score: newTextAnalysis.scores.generalScore,
-        }
-      : {}
-
-    const similarNamesUpdate = newSimilarNames
-      ? {
-          similarNames: {
-            connectOrCreate: newSimilarNames.map((name) => ({
-              where: {
-                name,
-              },
-              create: {
-                name,
-                ...newNameData,
-              },
-            })),
-          },
-        }
-      : {}
-
-    await prisma.name.update({
-      where: {
-        name,
-      },
-      data: {
-        ...descriptionUpdate,
-        ...textAnalysisUpdate,
-        ...similarNamesUpdate,
-      },
-    })
+  if (!initialName) {
+    return notFound()
   }
 
-  const nameFromDB =
-    newDescription || newTextAnalysis || newSimilarNames
-      ? await prisma.name.findUnique({
-          where: {
-            name,
-          },
-          include: {
-            similarNames: true,
-            similarTo: true,
-          },
-        })
-      : initialName
+  const initialSimilarNames = getSimilarNames({ nameFromDB: initialName })
 
   return {
-    ...nameFromDB,
-    similarNames: getSimilarNames({ nameFromDB }),
+    ...initialName,
+    similarNames: initialSimilarNames,
   }
 })
 
-const generateDescription = cache(async (name: string) => {
+export const generateDescription = cache(async (name: string) => {
+  const nameFromDB = await getInitialName(name)
+
+  if (nameFromDB.description) {
+    return nameFromDB.description
+  }
+
   const res = await askGPT({
-    model: llmToUse,
+    model: llmForDescription,
     messages: [
       {
         role: 'system',
-        content: `You are a Market Research Analyst. You get a brand or business name. Your Job is to write an first analysis about that name. Don't split it up into multiple segments. Be critical because our customers count on our analysis. Always start with "Analysis of the brand name "BRANDNAME":".`,
+        content: `You are a Market Research Analyst. You get a brand or business name. Your Job is to write an first analysis about that name. Don't split it up into multiple segments. This is really just a regular overview analysation, we will go in greater detail an in smaller categories like versatility in a later analysation. Be critical because our customers count on our analysis. Just start with the analysation you dont need a title like Brand Analysis: ${name}.`,
       },
       {
         role: 'user',
-        content: name,
+        content: `generate me a description for ${name}`,
       },
     ],
     temperature: 0.5,
   })
 
+  await prisma.name.update({
+    where: {
+      name,
+    },
+    data: {
+      description: res.message?.content,
+    },
+  })
+
   return res.message?.content
 })
 
+export const generateScoresComplete = cache(async (name: string) => {
+  const textAnalysis = await generateTextAnalysis(name)
+  const scores = await generateScores(name, textAnalysis)
+
+  await prisma.name.update({
+    where: {
+      name,
+    },
+    data: {
+      ...textAnalysis,
+      ...{
+        ...textAnalysis,
+        ...scores.scores,
+        score: scores.generalScore,
+      },
+    },
+  })
+
+  return {
+    textAnalysis,
+    scores,
+  }
+})
+
 const generateTextAnalysis = cache(async (name: string) => {
+  const nameFromDB = await getInitialName(name)
+
+  if (
+    nameFromDB.uniquenessDescription &&
+    nameFromDB.memorabilityDescription &&
+    nameFromDB.pronunciationDescription &&
+    nameFromDB.spellingDescription &&
+    nameFromDB.positivityDescription &&
+    nameFromDB.versatilityDescription &&
+    nameFromDB.globalAppealDescription
+  ) {
+    return {
+      uniquenessDescription: nameFromDB.uniquenessDescription,
+      memorabilityDescription: nameFromDB.memorabilityDescription,
+      pronunciationDescription: nameFromDB.pronunciationDescription,
+      spellingDescription: nameFromDB.spellingDescription,
+      positivityDescription: nameFromDB.positivityDescription,
+      versatilityDescription: nameFromDB.versatilityDescription,
+      globalAppealDescription: nameFromDB.globalAppealDescription,
+    }
+  }
+
   const res = await askGPT({
-    model: llmToUse,
+    model: llmForTextAnalysis,
     messages: [
       {
         role: 'system',
@@ -221,8 +178,33 @@ const generateScores = cache(
     name: string,
     analysations: z.infer<typeof scoreDescriptionSchema>
   ) => {
+    const nameFromDB = await getInitialName(name)
+
+    if (
+      nameFromDB.uniqueness &&
+      nameFromDB.memorability &&
+      nameFromDB.pronunciation &&
+      nameFromDB.spelling &&
+      nameFromDB.positivity &&
+      nameFromDB.versatility &&
+      nameFromDB.globalAppeal
+    ) {
+      return {
+        scores: {
+          uniqueness: nameFromDB.uniqueness,
+          memorability: nameFromDB.memorability,
+          pronunciation: nameFromDB.pronunciation,
+          spelling: nameFromDB.spelling,
+          positivity: nameFromDB.positivity,
+          versatility: nameFromDB.versatility,
+          globalAppeal: nameFromDB.globalAppeal,
+        },
+        generalScore: nameFromDB.score,
+      }
+    }
+
     const gptScores = await askGPT({
-      model: llmToUse,
+      model: llmForScores,
       messages: [
         {
           role: 'system',
@@ -273,10 +255,16 @@ const generateScores = cache(
   }
 )
 
-const generateSimilarNames = cache(
-  async (name: string, nrOfSimilarNames: number = 5) => {
+export const generateSimilarNames = cache(
+  async (name: string, nrOfSimilarNames: number) => {
+    const nameFromDB = await getInitialName(name)
+
+    if (nameFromDB.similarNames.length >= nrOfSimilarNames) {
+      return nameFromDB.similarNames
+    }
+
     const res = await askGPT({
-      model: llmToUse,
+      model: llmForSimilarNames,
       messages: [
         {
           role: 'system',
@@ -304,6 +292,26 @@ const generateSimilarNames = cache(
     const similarNames = similarNamesSchema.parse(
       JSON.parse(res.message?.function_call?.arguments || '{}')
     )
+
+    similarNames.similarNames.map(async (name) => {
+      await prisma.name.create({
+        data: {
+          name,
+          ...newNameData,
+          votes: 0,
+          similarTo: {
+            connect: {
+              name: nameFromDB.name,
+            },
+          },
+          similarNames: {
+            connect: {
+              name: nameFromDB.name,
+            },
+          },
+        },
+      })
+    })
 
     return similarNames.similarNames
   }

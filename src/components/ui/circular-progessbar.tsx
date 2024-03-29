@@ -34,7 +34,9 @@ export const CircularProgessbar = ({ value, size = 'large' }: Props) => {
           strokeLinecap="round"
         />
       </svg>
-      <span className={`absolute text-white ${fontSizeClass}`}>{value}</span>
+      <span className={`absolute text-inherit ${fontSizeClass}`}>
+        {value.toFixed()}
+      </span>
     </div>
   )
 }

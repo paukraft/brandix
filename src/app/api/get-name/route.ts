@@ -1,4 +1,4 @@
-import { getNameFromDB } from '@/lib/getNameFromDB'
+import { getInitialName } from '@/lib/getNameFromDB'
 import { NextResponse } from 'next/server'
 import { z } from 'zod'
 
@@ -9,7 +9,7 @@ export async function GET(request: Request) {
 
   const name = z.string().parse(nameParam)
 
-  const nameFromDB = await getNameFromDB(name)
+  const nameFromDB = await getInitialName(name)
 
   return NextResponse.json({ name: nameFromDB })
 }

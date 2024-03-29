@@ -1,11 +1,11 @@
-import { getNameFromDB } from '@/lib/getNameFromDB'
+import { generateDescription } from '@/lib/getNameFromDB'
 
 type Props = {
   name: string
 }
 
 export const NameDescription = async ({ name }: Props) => {
-  const nameFromDB = await getNameFromDB(name)
+  const nameFromDB = await generateDescription(name)
 
-  return <div>{nameFromDB?.description}</div>
+  return <div>{nameFromDB}</div>
 }
