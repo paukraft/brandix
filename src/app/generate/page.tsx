@@ -125,23 +125,29 @@ export default function Home() {
   }
 
   const send = async (message: string) => {
-    const groupedMessages = toRender.reduce((acc, item, i) => {
-      // @ts-expect-error Der is dumm
-      if (item.role === 'user') {
+    const groupedMessages = [
+      ...messages,
+      ...domains.slice(-25),
+      ...systemMessages,
+    ]
+      .sort((a, b) => a.createdAt.getTime() - b.createdAt.getTime())
+      .reduce((acc, item, i) => {
         // @ts-expect-error Der is dumm
-        acc.push({ content: item.content, role: 'user' })
-      } else {
-        // @ts-expect-error Der is dumm
-        if (acc.length === 0 || acc[acc.length - 1].role === 'user') {
+        if (item.role === 'user') {
           // @ts-expect-error Der is dumm
-          acc.push({ content: `${i}. ${item.name}`, role: 'assistant' })
+          acc.push({ content: item.content, role: 'user' })
         } else {
           // @ts-expect-error Der is dumm
-          acc[acc.length - 1].content += `\n${i}. ${item.name}`
+          if (acc.length === 0 || acc[acc.length - 1].role === 'user') {
+            // @ts-expect-error Der is dumm
+            acc.push({ content: `${i}. ${item.name}`, role: 'assistant' })
+          } else {
+            // @ts-expect-error Der is dumm
+            acc[acc.length - 1].content += `\n${i}. ${item.name}`
+          }
         }
-      }
-      return acc
-    }, [])
+        return acc
+      }, [])
 
     sendStream({
       url: '/api/generate',
