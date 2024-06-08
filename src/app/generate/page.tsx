@@ -280,12 +280,7 @@ export default function Home() {
   return (
     <>
       <div className="flex flex-col md:mt-4 lg:mt-8 xl:mt-12 max-w-2xl mx-auto w-full gap-3 px-4">
-        <div
-          className={cn(
-            'flex invisible justify-between gap-2',
-            toRender.length > 0 && 'visible'
-          )}
-        >
+        <div className={cn('flex justify-between gap-2')}>
           <DomainExtensionSelect
             extension={extension}
             setExtension={setExtension}
