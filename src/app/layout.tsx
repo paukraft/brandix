@@ -5,6 +5,7 @@ import { Toaster } from '@/components/ui/Toaster'
 import { Analytics } from '@vercel/analytics/react'
 import { Inter } from 'next/font/google'
 import './globals.css'
+import { OpenpanelProvider } from '@openpanel/nextjs'
 
 const inter = Inter({ subsets: ['latin'] })
 
@@ -68,6 +69,12 @@ export default function RootLayout({
           </main>
           <Toaster />
           <Analytics />
+          <OpenpanelProvider
+            clientId="bc225d94-b4e8-4664-8afc-ec7859e14939"
+            trackScreenViews={true}
+            trackAttributes={true}
+            trackOutgoingLinks={true}
+          />
         </ThemeProvider>
       </body>
     </html>
