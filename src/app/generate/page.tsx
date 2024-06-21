@@ -14,6 +14,7 @@ import { useToast } from '@/components/ui/use-toast'
 import { useStream } from '@/hooks/useStream'
 import { cn } from '@/lib/utils'
 import { Disclosure } from '@headlessui/react'
+import { increment } from '@openpanel/nextjs'
 import {
   Check,
   ChevronRight,
@@ -148,6 +149,8 @@ export default function Home() {
         }
         return acc
       }, [])
+
+    increment('generate', 1)
 
     sendStream({
       url: '/api/generate',
