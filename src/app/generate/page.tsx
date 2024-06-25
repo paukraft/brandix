@@ -162,6 +162,8 @@ export default function Home() {
         ],
       },
     })
+
+    trackEvent('generated_names')
   }
 
   const getUrl = (brandname: string) => {
@@ -200,10 +202,6 @@ export default function Home() {
     const newDomains = (
       streamResponse.messageIsStreaming ? sliced : splited
     ).map((item) => item.replace(/^\d+\.\s/, ''))
-
-    trackEvent('generated_names', {
-      newNamesCount: newDomains.length,
-    })
 
     // Debugging
     if (
