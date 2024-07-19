@@ -25,7 +25,7 @@ export async function POST(req: NextRequest) {
   }
 
   const { stream } = await openAIStream({
-    model: 'gpt-4o',
+    model: 'gpt-4o-mini',
     messages: [
       {
         content:
