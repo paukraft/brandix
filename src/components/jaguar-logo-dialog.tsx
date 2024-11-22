@@ -108,7 +108,6 @@ export default function JaguarLogoDialog({
             value={text}
             onChange={(e) => setText(e.target.value)}
             placeholder="Enter your brand name"
-            maxLength={20}
           />
         </div>
 
