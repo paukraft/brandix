@@ -90,9 +90,9 @@ export default function JaguarLogoDialog({
   }
 
   return (
-    <Dialog>
+    <Dialog onOpenChange={() => setText(initialText.trim())}>
       <DialogTrigger asChild>{children}</DialogTrigger>
-      <DialogContent className="flex flex-col gap-4 max-w-xl">
+      <DialogContent className="flex flex-col gap-4">
         <DialogHeader>
           <DialogTitle>Jaguar Logo Generator</DialogTitle>
           <DialogDescription>
@@ -115,7 +115,7 @@ export default function JaguarLogoDialog({
           <svg
             ref={svgRef}
             viewBox="0 0 1080 1080"
-            className="w-full aspect-square shadow-lg rounded-lg"
+            className="w-[40svh] aspect-square shadow-lg rounded-lg mx-auto max-w-full"
             style={{ fontFamily: 'var(--comfortaa)' }}
           >
             <defs>
