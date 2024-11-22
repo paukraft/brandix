@@ -8,9 +8,9 @@ import {
 import { AnimatedNumber } from '@/components/ui/animated-number'
 
 import { Button } from '@/components/ui/button'
+import ShimmerButton from '@/components/ui/shimmer-button'
 import { cn } from '@/lib/utils'
-import { SparklesIcon } from '@heroicons/react/24/solid'
-import { BrainCog, Check, Star } from 'lucide-react'
+import { ArrowRight, BrainCog, Check, ImageIcon, Star } from 'lucide-react'
 import Link from 'next/link'
 
 const FAQ: {
@@ -55,15 +55,12 @@ export default function Home() {
     <div className="flex flex-col gap-4 md:gap-16 xl:gap-24">
       {/* Hero */}
       <div className="px-4 container mx-auto flex items-center flex-col mt-6 md:mt-12 xl:mt-16 gap-6">
-        <Link href="/generate">
-          <Button
-            variant="outline"
-            className="rounded-full group/generate font-light py-1.5 h-auto px-2 dark:text-slate-100 dark:border-slate-600"
-          >
-            <SparklesIcon className="h-4 w-4 mr-2" />
-            New: Our AI is completly free to use
-            {/* <ArrowRight className="ml-2 w-4 group-hover/generate:translate-x-1 duration-100" /> */}
-          </Button>
+        <Link href="/jaguar-logo-generator">
+          <ShimmerButton className="rounded-full group/generate font-light py-1.5 h-auto px-3 dark:text-slate-100 dark:border-slate-600">
+            <ImageIcon className="h-4 w-4 mr-2" />
+            <span className="text-[#E90101]">New: Jaguar Logo Generator</span>
+            <ArrowRight className="ml-2 w-4 group-hover/generate:translate-x-1 duration-100" />
+          </ShimmerButton>
         </Link>
 
         <div className="relative text-4xl md:text-7xl font-bold text-center max-w-4xl leading-[1.1]">
