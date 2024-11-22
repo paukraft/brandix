@@ -1,7 +1,8 @@
 import { Domain } from '@/app/generate/page'
 import { cn } from '@/lib/utils'
-import { Star, Wand2 } from 'lucide-react'
+import { ImageIcon, Star, Wand2 } from 'lucide-react'
 import { Dispatch, SetStateAction } from 'react'
+import JaguarLogoDialog from './jaguar-logo-dialog'
 import { CopyButton } from './ui/CopyButton'
 import { SimpleTooltip } from './ui/SimpleTooltip'
 import { useToast } from './ui/use-toast'
@@ -57,7 +58,15 @@ export const DomainListItem = ({
       </div>
 
       <div className="flex gap-3 md:gap-4">
-        <div className="flex md:hidden group-hover/item:flex text-xs gap-1 md:gap-2 dark:text-gray-400">
+        <div className="flex md:hiddena group-hover/item:flex text-xs gap-1 md:gap-2 dark:text-gray-400">
+          <SimpleTooltip title="Jaguar Logo">
+            <div className="cursor-pointer">
+              <JaguarLogoDialog text={domain.name}>
+                <ImageIcon size={16} />
+              </JaguarLogoDialog>
+            </div>
+          </SimpleTooltip>
+
           <SimpleTooltip
             title={isFavorite ? 'Remove from favorites' : 'Add to favorites'}
           >

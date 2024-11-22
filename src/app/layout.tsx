@@ -2,12 +2,17 @@ import Footer from '@/components/Footer'
 import { NavBar } from '@/components/NavBar'
 import { ThemeProvider } from '@/components/ThemeProvider'
 import { Toaster } from '@/components/ui/Toaster'
-import { Analytics } from '@vercel/analytics/react'
-import { Inter } from 'next/font/google'
-import './globals.css'
+import { cn } from '@/lib/utils'
 import { OpenpanelProvider } from '@openpanel/nextjs'
+import { Analytics } from '@vercel/analytics/react'
+import { Comfortaa, Inter } from 'next/font/google'
+import './globals.css'
 
-const inter = Inter({ subsets: ['latin'] })
+const inter = Inter({ subsets: ['latin'], variable: '--inter' })
+const comfortaa = Comfortaa({
+  subsets: ['latin'],
+  variable: '--comfortaa',
+})
 
 export const metadata = {
   title: 'Brandix - Generate Brand Names Using AI',
@@ -53,7 +58,7 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en" className="dark dark:bg-slate-950 overflow-x-hidden">
-      <body className={inter.className}>
+      <body className={cn('font-inter', inter.variable, comfortaa.variable)}>
         <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
           <main className="flex min-h-screen flex-col relative gap-6">
             <NavBar />
