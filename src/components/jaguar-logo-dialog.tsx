@@ -8,6 +8,7 @@ import {
   DialogTitle,
   DialogTrigger,
 } from '@/components/ui/dialog'
+import { trackEvent } from '@openpanel/nextjs'
 import * as canvg from 'canvg'
 import { Download, Loader2 } from 'lucide-react'
 import { PropsWithChildren, useMemo, useRef, useState } from 'react'
@@ -87,6 +88,7 @@ export default function JaguarLogoDialog({
       link.click()
       document.body.removeChild(link)
     } finally {
+      trackEvent('downloaded_jaguar_logo')
       setIsDownloading(false)
     }
   }
