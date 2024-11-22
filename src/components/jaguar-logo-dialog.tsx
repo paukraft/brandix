@@ -8,7 +8,7 @@ import {
 } from '@/components/ui/dialog'
 import * as canvg from 'canvg'
 import { Download, Loader2 } from 'lucide-react'
-import { PropsWithChildren, useEffect, useMemo, useRef, useState } from 'react'
+import { PropsWithChildren, useMemo, useRef, useState } from 'react'
 import { Button } from './ui/button'
 import { Input } from './ui/input'
 import { Label } from './ui/label'
@@ -34,17 +34,6 @@ export default function JaguarLogoDialog({
   const [selectedColors, setSelectedColors] = useState(COLOR_PRESETS[0])
   const [text, setText] = useState(initialText.trim())
   const [isDownloading, setIsDownloading] = useState(false)
-
-  useEffect(() => {
-    // Load Comfortaa font for canvas
-    const font = new FontFace(
-      'Comfortaa',
-      'url(https://fonts.gstatic.com/s/comfortaa/v45/1Pt_g8LJRfWJmhDAuUsSQamb1W0lwk4S4WjMPrQVIT9c.woff2)'
-    )
-    font.load().then(() => {
-      document.fonts.add(font)
-    })
-  }, [])
 
   const fontSize = useMemo(() => {
     const SVG_WIDTH = 1080
