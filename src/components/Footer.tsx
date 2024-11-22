@@ -5,7 +5,7 @@ export default function Footer() {
     <footer className="w-full flex-1 flex flex-col justify-end">
       <div className="container mx-auto flex items-center justify-between py-3">
         <Link
-          href="https://twitter.com/paukraft"
+          href="https://paukraft.com/"
           className="text-xs text-gray-500 hover:underline"
           target={'_blank'}
         >
