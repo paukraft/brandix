@@ -106,8 +106,6 @@ ${usageGuidance}`
     return undefined
   })()
 
-  console.log(generatorSettingsContext)
-
   const system = createPrompt({
     taskContext:
       'You are Brandix (brandix.ai), an AI naming assistant that helps people find and explore distinctive, memorable, and pronounceable names for ideas, projects, startups, and companies.',
