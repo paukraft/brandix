@@ -1,0 +1,82 @@
+---
+description: 
+globs: 
+alwaysApply: true
+---
+We use bun.
+
+To install shadcn components use "bunx shadcn@latest add COMPONENT_NAME"
+But always check if we already installed it, we have most shadcn components installed already!!
+
+On components for the props dont create a extra type make it inline
+
+# Dialogs
+here is a example dialog how our dialogs should look, pls make sure all dialogs follow this layout so all look coherent:
+```tsx
+import { RiWalletLine } from "@remixicon/react"
+
+import { Button } from "@/components/ui/button"
+import { Checkbox } from "@/components/ui/checkbox"
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog"
+import { Input } from "@/components/ui/input"
+import { Label } from "@/components/ui/label"
+
+export const SomeDialog = () => {
+  return (
+    <Dialog>
+      <DialogTrigger asChild>
+        <Button variant="outline">Card details</Button>
+      </DialogTrigger>
+      <DialogContent>
+        <div className="flex flex-col gap-2">
+          <div
+            className="flex size-11 shrink-0 items-center justify-center rounded-full border"
+            aria-hidden="true"
+          >
+            <RiWalletLine className="opacity-80" size={16} />
+          </div>
+          <DialogHeader>
+            <DialogTitle className="text-left">Update your card</DialogTitle>
+            <DialogDescription className="text-left">
+              Your new card will replace your current card.
+            </DialogDescription>
+          </DialogHeader>
+        </div>
+
+        <div>Some Content</div>
+      </DialogContent>
+    </Dialog>
+  )
+}
+```
+
+Our Button component is a bit different from the base shadcn.
+It has a icon prop and a isLoading prop, pls always use the icon prop when you want a icon in the button and use isLoading for loading states, the isLoading will disable the button and make the icon to a loading spinner
+
+We use sonner for toasts
+
+Where possible dont use explisit colors but shadcn color variables so we support dark and light theme, and general themability.
+
+pls use simple-tooltip.tsx for tooltips
+
+Dont use any, always infer types if possible
+
+We use '@remixicon/react' for icons
+for example:
+import {
+  RiFindReplaceLine,
+  RiLogoutCircleLine,
+  RiMore2Line,
+  RiPulseLine,
+  RiTimer2Line,
+  RiUserLine,
+} from '@remixicon/react'
+
+never ever try to start the dev server, it already runs in the background
