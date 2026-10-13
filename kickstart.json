@@ -1,0 +1,9 @@
+{
+  "commands": [
+    {
+      "command": "bun install && bun dev",
+      "id": "command-bun-install-bun-dev",
+      "startMode": "auto"
+    }
+  ]
+}

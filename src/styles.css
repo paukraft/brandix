@@ -1,0 +1,595 @@
+@import "tailwindcss";
+@import "tw-animate-css";
+@import "shadcn/tailwind.css";
+@import "@fontsource-variable/geist";
+@import "@fontsource-variable/geist-mono";
+
+/*
+ * The visual language: paper and warm ink, one sage accent, surfaces told
+ * apart by tone alone (no borders, no shadows), and a soft wash of colour
+ * behind whatever is being looked at.
+ */
+
+@custom-variant dark (&:where(.dark, .dark *));
+
+@theme inline {
+  --font-sans: "Geist Variable", sans-serif;
+  --font-mono: "Geist Mono Variable", monospace;
+
+  --text-caption: 13px;
+  --text-caption--line-height: 1.538;
+  --text-note: 14px;
+  --text-note--line-height: 1.714;
+  --text-body: 15px;
+  --text-body--line-height: 1.6;
+  --text-heading: 17px;
+  --text-heading--line-height: 1.412;
+  --text-title: clamp(27px, 4.5vw, 32px);
+  --text-title--line-height: 1.25;
+  --text-display: clamp(31px, 6.5vw, 40px);
+  --text-display--line-height: 1.2;
+  --text-display--letter-spacing: -0.02em;
+
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  --color-popover: var(--popover);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-destructive: var(--destructive);
+  --color-border: var(--border);
+  --color-input: var(--input);
+  --color-ring: var(--ring);
+  --color-faint: var(--faint);
+  --color-scrim: var(--scrim);
+
+  --color-ok: var(--ok);
+  --color-ok-soft: var(--ok-soft);
+  --color-warn: var(--warn);
+  --color-warn-soft: var(--warn-soft);
+  --color-danger: var(--danger);
+  --color-danger-soft: var(--danger-soft);
+
+  /* Ground under everything, windows (`card`) on it, tiles set into a window. */
+  --color-ground: var(--ground);
+  --color-tile: var(--tile);
+
+  --radius-sm: calc(var(--radius) * 0.5);
+  --radius-md: calc(var(--radius) * 0.75);
+  --radius-lg: var(--radius);
+  --radius-xl: calc(var(--radius) * 1.5);
+  --radius-2xl: calc(var(--radius) * 2);
+  /* A window: its 8px inset plus the corner of what sits in it, so the curves stay concentric. */
+  --radius-window: calc(var(--radius) + 8px);
+}
+
+:root {
+  color-scheme: light;
+
+  --background: oklch(1 0 0);
+  --foreground: oklch(0.202 0.003 68);
+  --card: oklch(1 0 0);
+  --card-foreground: oklch(0.202 0.003 68);
+  --popover: oklch(1 0 0);
+  --popover-foreground: oklch(0.202 0.003 68);
+  --primary: oklch(0.202 0.003 68);
+  --primary-foreground: oklch(1 0 0);
+  --secondary: oklch(0.972 0 0);
+  --secondary-foreground: oklch(0.202 0.003 68);
+  --muted: oklch(0.972 0 0);
+  --muted-foreground: oklch(0.548 0.002 68);
+  --accent: oklch(0.766 0.068 114);
+  --accent-foreground: oklch(0.202 0.003 68);
+  --destructive: oklch(0.577 0.245 27.325);
+  --border: oklch(0.972 0 0);
+  --input: oklch(0.938 0.001 90);
+  --ring: oklch(0.202 0.003 68);
+  --faint: oklch(0.872 0.003 68);
+  --scrim: oklch(0.202 0.003 68 / 0.28);
+
+  --ok: oklch(0.508 0.085 150);
+  --ok-soft: oklch(0.955 0.022 150);
+  --warn: oklch(0.532 0.086 72);
+  --warn-soft: oklch(0.958 0.032 85);
+  --danger: oklch(0.532 0.146 27);
+  --danger-soft: oklch(0.962 0.018 25);
+
+  --ground: var(--muted);
+  --tile: var(--muted);
+
+  --radius: 4px;
+}
+
+.dark {
+  color-scheme: dark;
+
+  --background: oklch(0.168 0.004 68);
+  --foreground: oklch(0.955 0.002 68);
+  --card: oklch(0.209 0.004 68);
+  --card-foreground: oklch(0.955 0.002 68);
+  --popover: oklch(0.209 0.004 68);
+  --popover-foreground: oklch(0.955 0.002 68);
+  --primary: oklch(0.955 0.002 68);
+  --primary-foreground: oklch(0.168 0.004 68);
+  --secondary: oklch(0.259 0.004 68);
+  --secondary-foreground: oklch(0.955 0.002 68);
+  --muted: oklch(0.259 0.004 68);
+  --muted-foreground: oklch(0.668 0.004 68);
+  --accent: oklch(0.766 0.068 114);
+  --accent-foreground: oklch(0.202 0.003 68);
+  --destructive: oklch(0.665 0.205 25.5);
+  --border: oklch(0.278 0.004 68);
+  --input: oklch(0.324 0.004 68);
+  --ring: oklch(0.72 0.003 68);
+  --faint: oklch(0.378 0.004 68);
+  --scrim: oklch(0.118 0.004 68 / 0.62);
+
+  --ok: oklch(0.778 0.108 152);
+  --ok-soft: oklch(0.288 0.042 152);
+  --warn: oklch(0.818 0.107 80);
+  --warn-soft: oklch(0.298 0.04 72);
+  --danger: oklch(0.748 0.135 27);
+  --danger-soft: oklch(0.302 0.052 25);
+
+  --ground: var(--background);
+  --tile: oklch(0.955 0.002 68 / 0.05);
+}
+
+@layer base {
+  * {
+    @apply border-border outline-ring/50;
+  }
+  body {
+    @apply bg-ground font-sans text-body text-foreground antialiased;
+  }
+  ::selection {
+    @apply bg-accent text-accent-foreground;
+  }
+}
+
+/* iOS zooms into any field set below 16px. */
+@media (pointer: coarse) {
+  input,
+  textarea {
+    font-size: 16px;
+  }
+}
+
+@utility scroll-quiet {
+  overflow-y: auto;
+  scrollbar-width: thin;
+  scrollbar-color: var(--faint) transparent;
+}
+
+/* Every token flips at once on a theme change, so nothing should tween. */
+.theme-swap,
+.theme-swap *,
+.theme-swap *::before,
+.theme-swap *::after {
+  transition: none !important;
+}
+
+/*
+ * macOS-style selection blink: a chosen menu item drops its highlight for a
+ * beat, then gets it back before the menu acts and closes. See ui/menu.
+ */
+@keyframes menu-item-blink {
+  from,
+  to {
+    background-color: transparent;
+  }
+}
+
+/* Rows rise into place on the paint they mount on, staggered by `--i`. */
+@keyframes rise {
+  from {
+    opacity: 0;
+    translate: 0 6px;
+  }
+}
+.t-rise {
+  animation: rise 240ms cubic-bezier(0.22, 1, 0.36, 1) both;
+  animation-delay: calc(var(--i, 0) * 40ms);
+}
+
+/* Shimmer over text that is still being worked on ("Thinking…"). */
+@keyframes shimmer {
+  from {
+    background-position: 100% 0;
+  }
+  to {
+    background-position: -100% 0;
+  }
+}
+.t-shimmer {
+  background: linear-gradient(
+      90deg,
+      var(--muted-foreground) 40%,
+      var(--foreground) 50%,
+      var(--muted-foreground) 60%
+    )
+    0 0 / 200% 100%;
+  background-clip: text;
+  color: transparent;
+  animation: shimmer 1.6s linear infinite;
+}
+
+/*
+ * A section unfolds to its own height at an even pace, so a scroller that
+ * follows the growth glides instead of chasing jumps. Wants one child.
+ */
+@keyframes unfold {
+  from {
+    grid-template-rows: 0fr;
+    opacity: 0;
+  }
+}
+.t-unfold {
+  display: grid;
+  animation: unfold var(--unfold) linear both;
+}
+.t-unfold > * {
+  min-height: 0;
+  overflow: hidden;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .t-rise,
+  .t-shimmer,
+  .t-unfold {
+    animation: none;
+  }
+}
+
+/* Small controls still get a 44px hit area on touch screens. */
+@utility touch-target {
+  @media (pointer: coarse) {
+    &::after {
+      content: "";
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      width: 100%;
+      height: 100%;
+      min-width: 44px;
+      min-height: 44px;
+      translate: -50% -50%;
+    }
+  }
+}
+
+/* ── transitions.dev ─────────────────────────────────────────────
+   Tuned values from transitions.dev. Transitions that play once on
+   mount run as keyframes, so they work from the server-rendered paint
+   and replay by remounting (a React key) instead of class juggling. */
+:root {
+  --digit-dur: 500ms;
+  --digit-distance: 8px;
+  --digit-stagger: 70ms;
+  --digit-blur: 2px;
+  --digit-ease: cubic-bezier(0.34, 1.45, 0.64, 1);
+  --digit-dir-x: 0;
+  --digit-dir-y: 1;
+
+  --badge-slide-dur: 260ms;
+  --badge-pop-dur: 500ms;
+  --badge-pop-close-dur: 180ms;
+  --badge-fade-dur: 400ms;
+  --badge-fade-close-dur: 180ms;
+  --badge-blur: 2px;
+  --badge-offset-x: -8.2px;
+  --badge-offset-y: 12.4px;
+  --badge-slide-ease: cubic-bezier(0.22, 1, 0.36, 1);
+  --badge-pop-ease: cubic-bezier(0.34, 1.36, 0.64, 1);
+  --badge-close-ease: cubic-bezier(0.4, 0, 0.2, 1);
+
+  --text-swap-dur: 150ms;
+  --text-swap-translate-y: 4px;
+  --text-swap-blur: 2px;
+  --text-swap-ease: ease-in-out;
+
+  --dropdown-open-dur: 250ms;
+  --dropdown-close-dur: 150ms;
+  --dropdown-pre-scale: 0.97;
+  --dropdown-closing-scale: 0.99;
+  --dropdown-ease: cubic-bezier(0.22, 1, 0.36, 1);
+
+  --modal-open-dur: 250ms;
+  --modal-close-dur: 150ms;
+  --modal-scale: 0.96;
+  --modal-scale-close: 0.96;
+  --modal-ease: cubic-bezier(0.22, 1, 0.36, 1);
+
+  --icon-swap-dur: 250ms;
+  --icon-swap-blur: 2px;
+  --icon-swap-start-scale: 0.25;
+  --icon-swap-ease: ease-in-out;
+
+  --tt-in-dur: 150ms;
+  --tt-out-dur: 50ms;
+  --tt-scale: 0.98;
+  --tt-in-ease: ease-out;
+  --tt-out-ease: ease-out;
+
+  --stagger-dur: 500ms;
+  --stagger-distance: 12px;
+  --stagger-stagger: 40ms;
+  --stagger-blur: 3px;
+  --stagger-ease: cubic-bezier(0.22, 1, 0.36, 1);
+
+  --think-hold: 2000ms;
+
+  --unfold: 320ms;
+
+  --offers-open-dur: 350ms;
+  --offers-close-dur: 250ms;
+  --offers-ease: cubic-bezier(0.34, 1.25, 0.64, 1);
+  --offers-close-ease: cubic-bezier(0.22, 1, 0.36, 1);
+  --offers-fade-dur: 200ms;
+  --offers-exit-dur: 100ms;
+  --offers-row: 26px;
+  --offers-blur: 2px;
+
+  --stream-fade: 350ms;
+  --stream-blur: 1px;
+  --stream-ease: cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+/* Components layer, so utilities on the same element still win. */
+@layer components {
+  /* Number pop-in. */
+  @keyframes t-digit-pop-in {
+    0% {
+      transform: translate(
+        calc(var(--digit-distance) * var(--digit-dir-x)),
+        calc(var(--digit-distance) * var(--digit-dir-y))
+      );
+      opacity: 0;
+      filter: blur(var(--digit-blur));
+    }
+    100% {
+      transform: translate(0, 0);
+      opacity: 1;
+      filter: blur(0);
+    }
+  }
+  .t-digit-group {
+    display: inline-flex;
+    align-items: baseline;
+  }
+  .t-digit {
+    display: inline-block;
+    will-change: transform, opacity, filter;
+  }
+  .t-digit-group.is-animating .t-digit {
+    animation: t-digit-pop-in var(--digit-dur) var(--digit-ease) both;
+  }
+  .t-digit-group.is-animating .t-digit[data-stagger="1"] {
+    animation-delay: var(--digit-stagger);
+  }
+  .t-digit-group.is-animating .t-digit[data-stagger="2"] {
+    animation-delay: calc(var(--digit-stagger) * 2);
+  }
+
+  /* Notification badge. */
+  @keyframes t-badge-slide-in {
+    from {
+      transform: translate(var(--badge-offset-x), var(--badge-offset-y));
+    }
+    to {
+      transform: translate(0, 0);
+    }
+  }
+  .t-badge {
+    position: absolute;
+    top: -6px;
+    right: -8px;
+    pointer-events: none;
+    will-change: transform;
+  }
+  .t-badge[data-open="true"] {
+    animation: t-badge-slide-in var(--badge-slide-dur) var(--badge-slide-ease);
+  }
+  .t-badge-dot {
+    display: block;
+    transform-origin: center;
+    transform: scale(1);
+    opacity: 1;
+    filter: blur(0);
+    transition:
+      transform var(--badge-pop-dur) var(--badge-pop-ease),
+      opacity var(--badge-fade-dur) var(--badge-pop-ease),
+      filter var(--badge-pop-dur) var(--badge-pop-ease);
+    will-change: transform, opacity, filter;
+  }
+  .t-badge[data-open="false"] .t-badge-dot {
+    transform: scale(0);
+    opacity: 0;
+    filter: blur(var(--badge-blur));
+    transition:
+      transform var(--badge-pop-close-dur) var(--badge-close-ease),
+      opacity var(--badge-fade-close-dur) var(--badge-close-ease),
+      filter var(--badge-pop-close-dur) var(--badge-close-ease);
+  }
+
+  /* Text states swap: the old copy exits up, then the new one enters
+     from below. Both sit in one grid cell. */
+  @keyframes t-text-swap-exit {
+    to {
+      transform: translateY(calc(var(--text-swap-translate-y) * -1));
+      filter: blur(var(--text-swap-blur));
+      opacity: 0;
+    }
+  }
+  @keyframes t-text-swap-enter {
+    from {
+      transform: translateY(var(--text-swap-translate-y));
+      filter: blur(var(--text-swap-blur));
+      opacity: 0;
+    }
+  }
+  .t-text-swap {
+    display: inline-grid;
+  }
+  .t-text-swap > * {
+    grid-area: 1 / 1;
+  }
+  .t-text-swap .is-exit {
+    pointer-events: none;
+    animation: t-text-swap-exit var(--text-swap-dur) var(--text-swap-ease) both;
+  }
+  .t-text-swap .is-enter {
+    animation: t-text-swap-enter var(--text-swap-dur) var(--text-swap-ease)
+      var(--text-swap-dur) both;
+  }
+
+  /* Icon swap. */
+  .t-icon-swap {
+    position: relative;
+    display: inline-grid;
+  }
+  .t-icon-swap .t-icon {
+    grid-area: 1 / 1;
+    transition:
+      opacity var(--icon-swap-dur) var(--icon-swap-ease),
+      filter var(--icon-swap-dur) var(--icon-swap-ease),
+      transform var(--icon-swap-dur) var(--icon-swap-ease);
+  }
+  .t-icon-swap[data-state="a"] .t-icon[data-icon="a"],
+  .t-icon-swap[data-state="b"] .t-icon[data-icon="b"] {
+    opacity: 1;
+    filter: blur(0);
+    transform: scale(1);
+  }
+  .t-icon-swap[data-state="a"] .t-icon[data-icon="b"],
+  .t-icon-swap[data-state="b"] .t-icon[data-icon="a"] {
+    opacity: 0;
+    filter: blur(var(--icon-swap-blur));
+    transform: scale(var(--icon-swap-start-scale));
+  }
+
+  /* Texts reveal: lines rise in, held back by their index. */
+  @keyframes t-stagger-in {
+    from {
+      opacity: 0;
+      transform: translateY(var(--stagger-distance));
+      filter: blur(var(--stagger-blur));
+    }
+  }
+  .t-stagger-line {
+    display: block;
+    animation: t-stagger-in var(--stagger-dur) var(--stagger-ease) both;
+    animation-delay: calc(var(--stagger-stagger) * var(--line, 0));
+  }
+
+  /* Price badge: a pill grows into the list of what each registrar charges.
+     Its own row never moves; the surface drops from behind it, over `--rows`
+     more rows underneath, its top corners where they were. */
+  .t-offers {
+    position: relative;
+    display: inline-flex;
+    transition: scale 150ms cubic-bezier(0.2, 0, 0, 1);
+  }
+  /* Pressed, the pill gives as one piece; once open, each row does. */
+  .t-offers:not([data-open]):active,
+  .t-offers[data-open] a:active {
+    scale: 0.96;
+  }
+  .t-offers-panel {
+    position: absolute;
+    inset: 0;
+    border-radius: 12px;
+    transition:
+      bottom var(--offers-close-dur) var(--offers-close-ease),
+      box-shadow var(--offers-close-dur) var(--offers-close-ease);
+  }
+  /* Opens with a little bounce, closes calmly. */
+  .t-offers[data-open] .t-offers-panel {
+    bottom: calc(var(--rows) * var(--offers-row) * -1);
+    box-shadow: 0 12px 40px -12px oklch(0.2 0.003 68 / 0.25);
+    transition-duration: var(--offers-open-dur);
+    transition-timing-function: var(--offers-ease);
+  }
+  /* The other rows hang from the surface's lower edge and are cut off where
+     the pill ends, so they are drawn out from behind it and back. */
+  .t-offers-rest {
+    position: absolute;
+    inset: 100% 0 auto;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-end;
+    height: 0;
+    overflow: hidden;
+    transition: height var(--offers-close-dur) var(--offers-close-ease);
+  }
+  .t-offers[data-open] .t-offers-rest {
+    height: calc(var(--rows) * var(--offers-row));
+    transition-duration: var(--offers-open-dur);
+    transition-timing-function: var(--offers-ease);
+  }
+  .t-offers-rest > * {
+    flex: none;
+    padding-top: calc(var(--offers-row) - 24px);
+    opacity: 0;
+    filter: blur(var(--offers-blur));
+    transition:
+      opacity var(--offers-exit-dur) var(--offers-close-ease),
+      filter var(--offers-exit-dur) var(--offers-close-ease);
+  }
+  .t-offers[data-open] .t-offers-rest > * {
+    opacity: 1;
+    filter: blur(0);
+    transition-duration: var(--offers-fade-dur);
+  }
+  /* What holds an open badge comes forward, and stays there while it closes. */
+  .t-offers-host {
+    position: relative;
+    z-index: 0;
+    transition: z-index var(--offers-close-dur) step-end;
+  }
+  .t-offers-host:has(.t-offers[data-open]) {
+    z-index: 10;
+    transition-duration: 0s;
+  }
+
+  /* Streaming text: each word resolves as it arrives. */
+  @keyframes t-stream-in {
+    from {
+      opacity: 0;
+      filter: blur(var(--stream-blur));
+    }
+  }
+  .t-stream-w {
+    animation: t-stream-in var(--stream-fade) var(--stream-ease) both;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .t-badge,
+  .t-badge-dot,
+  .t-icon-swap .t-icon,
+  .t-offers,
+  .t-offers-panel,
+  .t-offers-rest,
+  .t-offers-rest > * {
+    animation: none !important;
+    transition: none !important;
+  }
+  .t-digit-group .t-digit,
+  .t-text-swap .is-enter,
+  .t-stagger-line,
+  .t-stream-w {
+    animation: none !important;
+  }
+  .t-text-swap .is-exit {
+    display: none;
+  }
+}

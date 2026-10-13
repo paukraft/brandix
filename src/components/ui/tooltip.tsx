@@ -1,61 +1,62 @@
-"use client"
-
-import * as React from "react"
-import * as TooltipPrimitive from "@radix-ui/react-tooltip"
+import { Tooltip as TooltipPrimitive } from "@base-ui/react/tooltip"
 
 import { cn } from "@/lib/utils"
 
-function TooltipProvider({
-  delayDuration = 0,
-  ...props
-}: React.ComponentProps<typeof TooltipPrimitive.Provider>) {
-  return (
-    <TooltipPrimitive.Provider
-      data-slot="tooltip-provider"
-      delayDuration={delayDuration}
-      {...props}
-    />
-  )
-}
-
+/**
+ * A second reading of something already on the page.
+ *
+ * The rule it keeps is that nothing here is only here: a tooltip elaborates —
+ * the exact stamp behind "4 minutes ago" — it never carries the only copy of
+ * something a reader needs, because a touch screen and a screen reader both
+ * arrive at the trigger without it. So the trigger stays legible alone, and
+ * this is what hovering adds.
+ *
+ * The popup mounts on open, which is why the content may be computed in the
+ * browser's own terms — a local time zone, a live count — without disagreeing
+ * with the markup the server sent.
+ */
 function Tooltip({
-  ...props
-}: React.ComponentProps<typeof TooltipPrimitive.Root>) {
-  return (
-    <TooltipProvider>
-      <TooltipPrimitive.Root data-slot="tooltip" {...props} />
-    </TooltipProvider>
-  )
-}
-
-function TooltipTrigger({
-  ...props
-}: React.ComponentProps<typeof TooltipPrimitive.Trigger>) {
-  return <TooltipPrimitive.Trigger data-slot="tooltip-trigger" {...props} />
-}
-
-function TooltipContent({
-  className,
-  sideOffset = 0,
+  trigger,
   children,
-  ...props
-}: React.ComponentProps<typeof TooltipPrimitive.Content>) {
+  side = "top",
+  align = "center",
+  delay = 200,
+  disabled = false,
+}: {
+  /** The element being explained — rendered as the trigger, not wrapped. */
+  trigger: React.ReactElement<Record<string, unknown>>
+  children: React.ReactNode
+  side?: "top" | "bottom" | "left" | "right"
+  align?: "start" | "center" | "end"
+  delay?: number
+  /** For a trigger that only sometimes hides what the tooltip would say. */
+  disabled?: boolean
+}) {
   return (
-    <TooltipPrimitive.Portal>
-      <TooltipPrimitive.Content
-        data-slot="tooltip-content"
-        sideOffset={sideOffset}
-        className={cn(
-          "bg-primary text-primary-foreground animate-in fade-in-0 zoom-in-95 data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=closed]:zoom-out-95 data-[side=bottom]:slide-in-from-top-2 data-[side=left]:slide-in-from-right-2 data-[side=right]:slide-in-from-left-2 data-[side=top]:slide-in-from-bottom-2 z-50 w-fit origin-(--radix-tooltip-content-transform-origin) rounded-md px-3 py-1.5 text-xs text-balance",
-          className
-        )}
-        {...props}
-      >
-        {children}
-        <TooltipPrimitive.Arrow className="bg-primary fill-primary z-50 size-2.5 translate-y-[calc(-50%_-_2px)] rotate-45 rounded-[2px]" />
-      </TooltipPrimitive.Content>
-    </TooltipPrimitive.Portal>
+    <TooltipPrimitive.Root disabled={disabled}>
+      <TooltipPrimitive.Trigger delay={delay} render={trigger} />
+      <TooltipPrimitive.Portal>
+        {/* The z-index belongs on the positioner: the popup is statically
+            positioned, so a z-index on it is ignored. */}
+        <TooltipPrimitive.Positioner
+          sideOffset={6}
+          side={side}
+          align={align}
+          className="z-50"
+        >
+          <TooltipPrimitive.Popup
+            className={cn(
+              "max-w-[min(20rem,calc(100vw-2rem))] origin-[var(--transform-origin)] rounded-md bg-popover px-2 py-1 text-caption text-popover-foreground shadow-[0_8px_28px_-12px_oklch(0.2_0.003_68/0.3)]",
+              // Eases in, gets out of the way almost at once.
+              "transition-[scale,opacity] duration-(--tt-in-dur) ease-(--tt-in-ease) data-ending-style:scale-(--tt-scale) data-ending-style:opacity-0 data-ending-style:duration-(--tt-out-dur) data-ending-style:ease-(--tt-out-ease) data-starting-style:scale-(--tt-scale) data-starting-style:opacity-0 motion-reduce:transition-none"
+            )}
+          >
+            {children}
+          </TooltipPrimitive.Popup>
+        </TooltipPrimitive.Positioner>
+      </TooltipPrimitive.Portal>
+    </TooltipPrimitive.Root>
   )
 }
 
-export { Tooltip, TooltipTrigger, TooltipContent, TooltipProvider }
+export { Tooltip }

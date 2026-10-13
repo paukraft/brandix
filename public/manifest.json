@@ -1,9 +1,14 @@
 {
   "name": "Brandix",
   "short_name": "Brandix",
-  "description": "AI-powered brand naming assistant",
+  "description": "AI brand naming with live domain checks",
   "start_url": "/",
   "display": "standalone",
-  "background_color": "#ffffff",
-  "theme_color": "#000000"
+  "background_color": "#1a1917",
+  "theme_color": "#1a1917",
+  "icons": [
+    { "src": "/favicon.svg", "sizes": "any", "type": "image/svg+xml" },
+    { "src": "/icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any maskable" },
+    { "src": "/icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any maskable" }
+  ]
 }
