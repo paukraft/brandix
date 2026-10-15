@@ -43,12 +43,9 @@ const suggestNamesInput = z.object({
     .max(DIRECTIONS_MAX),
 })
 
-/** The names this turn's earlier rounds drafted, as domain labels. */
+/** The names the conversation's earlier rounds drafted, as domain labels. */
 function draftedLabels(messages: ModelMessage[]) {
-  const turn = messages.slice(
-    messages.findLastIndex((message) => message.role === "user") + 1
-  )
-  const inputs = turn.flatMap((message) =>
+  const inputs = messages.flatMap((message) =>
     message.role === "assistant" && typeof message.content !== "string"
       ? message.content.flatMap((part) =>
           part.type === "tool-call" && part.toolName === "suggestNames"

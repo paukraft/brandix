@@ -325,10 +325,6 @@
   --stagger-blur: 3px;
   --stagger-ease: cubic-bezier(0.22, 1, 0.36, 1);
 
-  --think-hold: 2000ms;
-
-  --unfold: 320ms;
-
   --offers-open-dur: 350ms;
   --offers-close-dur: 250ms;
   --offers-ease: cubic-bezier(0.34, 1.25, 0.64, 1);

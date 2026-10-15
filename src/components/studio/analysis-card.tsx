@@ -15,6 +15,9 @@ function formatScore(score: number) {
   return (Math.round(score * 10) / 10).toFixed(1)
 }
 
+/** How long one section takes to unfold, in ms. */
+const UNFOLD_MS = 320
+
 /**
  * Counts up to `target` one unfold at a time, so sections that arrive in a
  * burst still land in turn and the card grows at an even pace.
@@ -24,10 +27,7 @@ function usePaced(target: number) {
 
   useEffect(() => {
     if (shown >= target) return
-    const unfold = parseFloat(
-      getComputedStyle(document.documentElement).getPropertyValue("--unfold")
-    )
-    const timer = setTimeout(() => setShown(shown + 1), unfold)
+    const timer = setTimeout(() => setShown(shown + 1), UNFOLD_MS)
     return () => clearTimeout(timer)
   }, [shown, target])
 
@@ -66,7 +66,10 @@ export function AnalysisCard({
     : 100
 
   return (
-    <article className="overflow-hidden rounded-lg bg-tile">
+    <article
+      className="overflow-hidden rounded-lg bg-tile"
+      style={{ "--unfold": `${UNFOLD_MS}ms` } as React.CSSProperties}
+    >
       <header className="flex items-end justify-between gap-4 p-5">
         <div className="min-w-0">
           <p className="text-caption text-muted-foreground">Analysis</p>

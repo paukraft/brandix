@@ -12,20 +12,17 @@ import { SHOWN_MIN, type Round } from "@/lib/naming"
 type Part = BrandixMessage["parts"][number]
 
 const THINKING = ["Thinking…", "Exploring directions…", "Weighing options…"]
+/** How long each `THINKING` line holds, in ms. */
+const THINKING_HOLD = 2000
 
 /** A shimmering status line that steps through `THINKING` while it waits. */
 function ThinkingLine() {
   const [index, setIndex] = useState(0)
 
   useEffect(() => {
-    const hold = parseFloat(
-      getComputedStyle(document.documentElement).getPropertyValue(
-        "--think-hold"
-      )
-    )
     const timer = setInterval(
       () => setIndex((i) => (i + 1) % THINKING.length),
-      hold
+      THINKING_HOLD
     )
     return () => clearInterval(timer)
   }, [])
